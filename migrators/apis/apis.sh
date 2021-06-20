@@ -10,8 +10,7 @@ main() {
   local kubernetes_repo_root_dir="$1"
   local destination_path="$2"
 
-  waitress "${kubernetes_repo_root_dir}" "cmd/kube-apiserver/app/testing/testdata" "${destination_path}"
-  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/apiextensions-apiserver/pkg/cmd/server/testing/testdata" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "pkg/security/apparmor/testdata" "${destination_path}"
 }
 
 main "$@"

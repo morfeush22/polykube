@@ -37,3 +37,21 @@ cmd/kubelet
 
 1. generate deps (with test) in temporary path
 2. pass path to temporary
+
+/_output/bin/e2e.test -context kind-kind -ginkgo.focus="\[Conformance\]" -num-nodes 2
+kind create cluster --config kind-config.yaml --image kindest/node:latest -v4
+export KUBECONFIG="${HOME}/.kube/kind-test-config"
+
+deps.txt in all packages
+Makefile template
+
+# necessary for conformance
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  ipFamily: ipv4
+nodes:
+# the control plane node
+- role: control-plane
+- role: worker
+- role: worker

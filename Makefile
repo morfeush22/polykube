@@ -30,7 +30,6 @@ KUBERNETES_INTEGRATION_TESTS := \
 	apimachinery \
 	apiserver \
 	auth \
-	benchmark \
 	certificates \
 	client \
 	configmap \
@@ -47,7 +46,6 @@ KUBERNETES_INTEGRATION_TESTS := \
 	events \
 	evictions \
 	examples \
-	framework \
 	garbagecollector \
 	ipamperf \
 	kubelet \
@@ -72,9 +70,41 @@ KUBERNETES_INTEGRATION_TESTS := \
 	storageversion \
 	tls \
 	ttlcontroller \
-	util \
 	volume \
 	volumescheduling
+
+KUBERNETES_APIS := \
+	api\
+	apis \
+	auth \
+	capabilities \
+	client \
+	cloudprovider \
+	cluster \
+	controller \
+	controlplane \
+	credentialprovider \
+	features \
+	fieldpath \
+	generated \
+	kubeapiserver \
+	kubectl \
+	kubelet \
+	kubemark \
+	printers \
+	probe \
+	proxy \
+	quota \
+	registry \
+	routes \
+	scheduler \
+	security \
+	securitycontext \
+	serviceaccount \
+	ssh \
+	util \
+	volume \
+	windows
 
 KUBERNETES_BINARY_COMPONENTS_SUBDIRS_TARGETS := $(addprefix _create_binary_component_subdir_,$(KUBERNETES_BINARY_COMPONENTS))
 KUBERNETES_BINARY_COMPONENTS_MIGRATE_TARGETS := $(addprefix _migrate_binary_component_to_polyrepo_,$(KUBERNETES_BINARY_COMPONENTS))
@@ -82,16 +112,22 @@ KUBERNETES_BINARY_COMPONENTS_MIGRATE_TARGETS := $(addprefix _migrate_binary_comp
 KUBERNETES_INTEGRATION_TESTS_SUBDIRS_TARGETS := $(addprefix _create_integration_test_subdir_,$(KUBERNETES_INTEGRATION_TESTS))
 KUBERNETES_INTEGRATION_TESTS_MIGRATE_TARGETS := $(addprefix _migrate_integration_test_to_polyrepo_,$(KUBERNETES_INTEGRATION_TESTS))
 
+KUBERNETES_APIS_SUBDIRS_TARGETS := $(addprefix _create_api_subdir_,$(KUBERNETES_APIS))
+KUBERNETES_APIS_MIGRATE_TARGETS := $(addprefix _migrate_api_to_polyrepo_,$(KUBERNETES_APIS))
+
 SHELL = bash
 
 create_binary_components_subdirs: $(KUBERNETES_BINARY_COMPONENTS_SUBDIRS_TARGETS)
 create_integration_tests_subdirs: $(KUBERNETES_INTEGRATION_TESTS_SUBDIRS_TARGETS)
+create_apis_subdirs: $(KUBERNETES_APIS_SUBDIRS_TARGETS)
 
 migrate_binary_components_to_polyrepo: $(KUBERNETES_BINARY_COMPONENTS_MIGRATE_TARGETS)
 migrate_integration_tests_to_polyrepo: $(KUBERNETES_INTEGRATION_TESTS_MIGRATE_TARGETS)
+migrate_apis_to_polyrepo: $(KUBERNETES_APIS_MIGRATE_TARGETS)
 
-POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR := $(POLYREPO_DEST_ROOT_DIR)/binary_component
-POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR := $(POLYREPO_DEST_ROOT_DIR)/integration_test
+POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR := $(POLYREPO_DEST_ROOT_DIR)/binary_components
+POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR := $(POLYREPO_DEST_ROOT_DIR)/integration_tests
+POLYREPO_APIS_DEST_ROOT_DIR              := $(POLYREPO_DEST_ROOT_DIR)/apis
 
 clean:
 	rm -rf $(POLYREPO_DEST_ROOT_DIR)
@@ -102,14 +138,23 @@ _create_binary_component_subdir_%:
 _create_integration_test_subdir_%:
 	mkdir -p $(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*)
 
+_create_api_subdir_%:
+	mkdir -p $(POLYREPO_APIS_DEST_ROOT_DIR)/$(*)
+
 _migrate_binary_component_common_%:
 	migrators/bar.sh $(KUBERNETES_REPO_ROOT_DIR) $($(*)_RELATIVE_SUBPATH) $(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*)
 
 _migrate_integration_test_common_%:
 	migrators/bar.sh $(KUBERNETES_REPO_ROOT_DIR) test/integration/$(*) $(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*)
 
+_migrate_api_common_%:
+	migrators/bar.sh $(KUBERNETES_REPO_ROOT_DIR) pkg/$(*) $(POLYREPO_APIS_DEST_ROOT_DIR)/$(*)
+
 _migrate_binary_component_to_polyrepo_%: _create_binary_component_subdir_% _migrate_binary_component_common_%
-	migrators/binary_components/$(*).sh $(KUBERNETES_REPO_ROOT_DIR) $($(*)_RELATIVE_SUBPATH) $(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*)
+	migrators/binary_components/$(*).sh $(KUBERNETES_REPO_ROOT_DIR) $(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*)
 
 _migrate_integration_test_to_polyrepo_%: _create_integration_test_subdir_% _migrate_integration_test_common_%
-	migrators/integration_tests/$(*).sh $(KUBERNETES_REPO_ROOT_DIR) test/integration/$(*) $(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*)
+	migrators/integration_tests/$(*).sh $(KUBERNETES_REPO_ROOT_DIR) $(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*)
+
+_migrate_api_to_polyrepo_%: _create_api_subdir_% _migrate_api_common_%
+	migrators/apis/$(*).sh $(KUBERNETES_REPO_ROOT_DIR) $(POLYREPO_APIS_DEST_ROOT_DIR)/$(*)
