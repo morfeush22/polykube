@@ -9,18 +9,22 @@ calculate_package_absolute_path() {
   local kubernetes_repo_root_dir="$1"
   local package="$2"
 
+  local -n absolute_path="$3"
+
   local -r kubernetes_module_spec='k8s.io/kubernetes'
 
-  local package_absolute_path
-  if [[ "${package}" == vendor/* ]]; then
-    package_absolute_path="${kubernetes_repo_root_dir}/${package}"
+  if [[ "${package}" =~ ^(.*)[[:space:]]\[.*\]$ ]]; then
+    local fixed_package_spec="${BASH_REMATCH[1]}"
+    WARN "fixing ${package} to ${fixed_package_spec}"
+    calculate_package_absolute_path "${kubernetes_repo_root_dir}" "${fixed_package_spec}" "$3"
   elif [[ "${package}" == "${kubernetes_module_spec}"/* ]]; then
-    package_absolute_path="${kubernetes_repo_root_dir}/${package##${kubernetes_module_spec}/}"
+    absolute_path="${kubernetes_repo_root_dir}/${package##${kubernetes_module_spec}/}"
+  elif [[ "${package}" == vendor/* ]]; then
+    absolute_path="${kubernetes_repo_root_dir}/${package}"
   else
-    package_absolute_path="${kubernetes_repo_root_dir}/vendor/${package}"
+    # shellcheck disable=SC2034
+    absolute_path="${kubernetes_repo_root_dir}/vendor/${package}"
   fi
-
-  echo "${package_absolute_path}"
 }
 
 extract_dependencies_from_go_package_deps() {
@@ -34,11 +38,8 @@ extract_dependencies_from_go_package_deps() {
 
   for package in "${package_array[@]}"; do
     local package_absolute_path
-    package_absolute_path="$(
-      calculate_package_absolute_path \
-        "${kubernetes_repo_root_dir}" \
-        "${package}"
-    )"
+
+    calculate_package_absolute_path "${kubernetes_repo_root_dir}" "${package}" package_absolute_path
 
     if [[ ! -d "${package_absolute_path}" ]]; then
       WARN "${package_absolute_path} does not exist, skipping"
@@ -104,7 +105,7 @@ whisky() {
 
   local component_absolute_path="${kubernetes_repo_root_dir}/${component_relative_path}"
 
-  mapfile -t dirs_to_traverse < <(find "${component_absolute_path}" -maxdepth 1 ! -path "${component_absolute_path}" -type d)
+  mapfile -t dirs_to_traverse < <(find "${component_absolute_path}" -maxdepth 1 -type d)
 
   local go_deps_dirs_candidates=()
 
@@ -114,6 +115,7 @@ whisky() {
 
     mapfile -t new_dirs < <(find "${current_dir}" -maxdepth 1 ! -path "${current_dir}" -type d)
     dirs_to_traverse=("${dirs_to_traverse[@]}" "${new_dirs[@]}")
+
     go_deps_dirs_candidates+=("${current_dir}")
   done
 
@@ -124,7 +126,7 @@ whisky() {
 
     generate_go_package_deps_file "${go_deps_dir_candidate}" "${component_relative_path##*/}" temp_go_package_deps_path
 
-    INFO "generated temporary go deps path for <${go_deps_dir_candidate}> is ${temp_go_package_deps_path}"
+    INFO "generated temporary go deps path for ${go_deps_dir_candidate} is ${temp_go_package_deps_path}"
 
     go_deps_files+=("${temp_go_package_deps_path}")
   done
@@ -141,6 +143,7 @@ whisky() {
   sugar "${kubernetes_repo_root_dir}" "${polyrepo_dest_root_dir}"
 }
 
+# not used right now
 vodka() {
   local kubernetes_repo_root_dir="$1"
   local component_relative_path="$2"
