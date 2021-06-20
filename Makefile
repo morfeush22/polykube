@@ -80,31 +80,26 @@ KUBERNETES_APIS := \
 	capabilities \
 	client \
 	cloudprovider \
-	cluster \
 	controller \
 	controlplane \
 	credentialprovider \
-	features \
 	fieldpath \
 	generated \
 	kubeapiserver \
 	kubectl \
 	kubelet \
-	kubemark \
 	printers \
 	probe \
 	proxy \
 	quota \
 	registry \
-	routes \
 	scheduler \
 	security \
 	securitycontext \
 	serviceaccount \
 	ssh \
 	util \
-	volume \
-	windows
+	volume
 
 KUBERNETES_BINARY_COMPONENTS_SUBDIRS_TARGETS := $(addprefix _create_binary_component_subdir_,$(KUBERNETES_BINARY_COMPONENTS))
 KUBERNETES_BINARY_COMPONENTS_MIGRATE_TARGETS := $(addprefix _migrate_binary_component_to_polyrepo_,$(KUBERNETES_BINARY_COMPONENTS))
