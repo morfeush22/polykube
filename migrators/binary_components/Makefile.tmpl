@@ -1,0 +1,11 @@
+{{- $target := (getenv "TARGET") -}}
+{{- $test_target := (getenv "TEST_TARGET") -}}
+{{- $bin := filepath.Base $target -}}
+all: {{ strings.ReplaceAll "/" "_" $target }} test_{{ strings.ReplaceAll "/" "_" $test_target }}
+
+{{ strings.ReplaceAll "/" "_" $target }}:
+	cd {{ $target }} && go build .
+	cp {{ $target }}/{{ $bin }} .
+
+test_{{ strings.ReplaceAll "/" "_" $test_target }}:
+	cd {{ $target }} && go test ./{{ $test_target }}/...

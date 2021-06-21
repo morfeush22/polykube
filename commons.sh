@@ -3,7 +3,7 @@
 # shellcheck disable=SC1090
 source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/b-log.sh
 
-declare -a PACKAGE_ABSOLUTE_PATH_ARRAY
+declare -a KUB_PACKAGE_ABSOLUTE_PATH_ARRAY
 
 calculate_package_absolute_path() {
   local kubernetes_repo_root_dir="$1"
@@ -27,24 +27,24 @@ calculate_package_absolute_path() {
   fi
 }
 
-extract_dependencies_from_go_package_deps() {
+extract_internal_dependencies_from_go_package_deps() {
   local kubernetes_repo_root_dir="$1"
   local go_package_deps_file_path="$2"
 
-  local packages
-  packages="$(grep '\.' "${go_package_deps_file_path}")"
+  local kub_packages
+  kub_packages="$(grep '\.' "${go_package_deps_file_path}")"
 
-  readarray -t package_array <<<"${packages}"
+  readarray -t kub_package_array <<<"${kub_packages}"
 
-  for package in "${package_array[@]}"; do
-    local package_absolute_path
+  for kub_package in "${kub_package_array[@]}"; do
+    local kub_package_absolute_path
 
-    calculate_package_absolute_path "${kubernetes_repo_root_dir}" "${package}" package_absolute_path
+    calculate_package_absolute_path "${kubernetes_repo_root_dir}" "${kub_package}" kub_package_absolute_path
 
-    if [[ ! -d "${package_absolute_path}" ]]; then
-      WARN "${package_absolute_path} does not exist, skipping"
+    if [[ ! -d "${kub_package_absolute_path}" ]]; then
+      WARN "${kub_package_absolute_path} does not exist, skipping"
     else
-      PACKAGE_ABSOLUTE_PATH_ARRAY+=("${package_absolute_path}")
+      KUB_PACKAGE_ABSOLUTE_PATH_ARRAY+=("${kub_package_absolute_path}")
     fi
   done
 }
@@ -52,24 +52,24 @@ extract_dependencies_from_go_package_deps() {
 bartender() {
   local kubernetes_repo_root_dir="$1"
   local go_package_deps_file_path="$2"
-  local destination_path="$3"
+  local destination_root_dir="$3"
 
-  extract_dependencies_from_go_package_deps \
+  extract_internal_dependencies_from_go_package_deps \
     "${kubernetes_repo_root_dir}" \
     "${go_package_deps_file_path}"
 
   copy_dependent_packages_to_destination \
     "${kubernetes_repo_root_dir}" \
-    "${destination_path}"
+    "${destination_root_dir}"
 }
 
 waitress() {
   local kubernetes_repo_root_dir="$1"
   local kubernetes_source_relative_path="$2"
-  local destination_path="$3"
+  local destination_root_dir="$3"
 
   local source_absolute_path="${kubernetes_repo_root_dir}/${kubernetes_source_relative_path}"
-  local destination_absolute_path="${destination_path}/${kubernetes_source_relative_path}"
+  local destination_absolute_path="${destination_root_dir}/${kubernetes_source_relative_path}"
 
   if [[ -f "${source_absolute_path}" ]]; then
     mkdir -p "${destination_absolute_path%/*}"
@@ -84,28 +84,47 @@ waitress() {
 
 sugar() {
   local kubernetes_repo_root_dir="$1"
-  local destination_path="$2"
+  local destination_root_dir="$2"
 
   local -r go_mod='go.mod'
   local -r go_sum='go.sum'
   local -r vendor_modules_txt='modules.txt'
 
-  cp "${kubernetes_repo_root_dir}/${go_mod}" "${destination_path}/${go_mod}"
-  cp "${kubernetes_repo_root_dir}/${go_sum}" "${destination_path}/${go_sum}"
+  cp "${kubernetes_repo_root_dir}/${go_mod}" "${destination_root_dir}/${go_mod}"
+  cp "${kubernetes_repo_root_dir}/${go_sum}" "${destination_root_dir}/${go_sum}"
 
-  if [[ -d "${destination_path}/vendor" ]]; then
-    cp "${kubernetes_repo_root_dir}/vendor/${vendor_modules_txt}" "${destination_path}/vendor/${vendor_modules_txt}"
+  if [[ -d "${destination_root_dir}/vendor" ]]; then
+    cp "${kubernetes_repo_root_dir}/vendor/${vendor_modules_txt}" "${destination_root_dir}/vendor/${vendor_modules_txt}"
   fi
 }
 
 whisky() {
   local kubernetes_repo_root_dir="$1"
-  local component_relative_path="$2"
+  local kubernetes_source_relative_path="$2"
   local polyrepo_dest_root_dir="$3"
 
-  local component_absolute_path="${kubernetes_repo_root_dir}/${component_relative_path}"
+  local final_temp_deps_file_path
 
-  mapfile -t dirs_to_traverse < <(find "${component_absolute_path}" -maxdepth 1 -type d)
+  construct_final_deps_file "${kubernetes_repo_root_dir}" "${kubernetes_source_relative_path}" final_temp_deps_file_path
+
+  INFO "generated final temporary go deps path is ${final_temp_deps_file_path}"
+
+  bartender "${kubernetes_repo_root_dir}" "${final_temp_deps_file_path}" "${polyrepo_dest_root_dir}"
+  waitress "${kubernetes_repo_root_dir}" "${kubernetes_source_relative_path}" "${polyrepo_dest_root_dir}"
+  sugar "${kubernetes_repo_root_dir}" "${polyrepo_dest_root_dir}"
+}
+
+construct_final_deps_file() {
+  local kubernetes_repo_root_dir="$1"
+  local kubernetes_source_relative_path="$2"
+
+  local -n final_temp_go_package_deps_path="$3"
+
+  local component_absolute_path="${kubernetes_repo_root_dir}/${kubernetes_source_relative_path}"
+
+  INFO "component absolute path: ${component_absolute_path}"
+
+  mapfile -t dirs_to_traverse < <(find -L "${component_absolute_path}" -maxdepth 1 -type d)
 
   local go_deps_dirs_candidates=()
 
@@ -113,7 +132,7 @@ whisky() {
     local current_dir="${dirs_to_traverse[0]}"
     dirs_to_traverse=("${dirs_to_traverse[@]:1}")
 
-    mapfile -t new_dirs < <(find "${current_dir}" -maxdepth 1 ! -path "${current_dir}" -type d)
+    mapfile -t new_dirs < <(find -L "${current_dir}" -maxdepth 1 ! -path "${current_dir}" -type d)
     dirs_to_traverse=("${dirs_to_traverse[@]}" "${new_dirs[@]}")
 
     go_deps_dirs_candidates+=("${current_dir}")
@@ -122,44 +141,27 @@ whisky() {
   local go_deps_files=()
 
   for go_deps_dir_candidate in "${go_deps_dirs_candidates[@]}"; do
+    local temp_file_prefix="${kubernetes_source_relative_path##*/}"
+
     local temp_go_package_deps_path
 
-    generate_go_package_deps_file "${go_deps_dir_candidate}" "${component_relative_path##*/}" temp_go_package_deps_path
+    generate_go_package_deps_file "${go_deps_dir_candidate}" "${temp_file_prefix}" temp_go_package_deps_path
 
     INFO "generated temporary go deps path for ${go_deps_dir_candidate} is ${temp_go_package_deps_path}"
 
     go_deps_files+=("${temp_go_package_deps_path}")
   done
 
-  local final_temp_go_package_deps_path
-  final_temp_go_package_deps_path="/tmp/${component_relative_path##*/}.$(uuidgen)"
+  final_temp_go_package_deps_path="/tmp/${kubernetes_source_relative_path##*/}.$(uuidgen)"
 
   cat "${go_deps_files[@]}" | sort | uniq >"${final_temp_go_package_deps_path}"
-
-  INFO "generated final temporary go deps path is ${final_temp_go_package_deps_path}"
-
-  bartender "${kubernetes_repo_root_dir}" "${final_temp_go_package_deps_path}" "${polyrepo_dest_root_dir}"
-  waitress "${kubernetes_repo_root_dir}" "${component_relative_path}" "${polyrepo_dest_root_dir}"
-  sugar "${kubernetes_repo_root_dir}" "${polyrepo_dest_root_dir}"
 }
 
-# not used right now
-vodka() {
-  local kubernetes_repo_root_dir="$1"
-  local component_relative_path="$2"
-  local polyrepo_dest_root_dir="$3"
+party() {
+  local template_path="$1"
+  local destination_root_dir="$2"
 
-  local temp_go_package_deps_path
-
-  local component_absolute_path="${kubernetes_repo_root_dir}/${component_relative_path}"
-
-  generate_go_package_deps_file "${component_absolute_path}" "${component_relative_path##*/}" temp_go_package_deps_path
-
-  INFO "generated temporary go deps path is ${temp_go_package_deps_path}"
-
-  bartender "${kubernetes_repo_root_dir}" "${temp_go_package_deps_path}" "${polyrepo_dest_root_dir}"
-  waitress "${kubernetes_repo_root_dir}" "${component_relative_path}" "${polyrepo_dest_root_dir}"
-  sugar "${kubernetes_repo_root_dir}" "${polyrepo_dest_root_dir}"
+  gomplate -f "${template_path}" -o "${destination_root_dir}"/Makefile
 }
 
 generate_go_package_deps_file() {
@@ -179,16 +181,16 @@ generate_go_package_deps_file() {
 
 copy_dependent_packages_to_destination() {
   local kubernetes_repo_root_dir="$1"
-  local destination_path="$2"
+  local destination_root_dir="$2"
 
-  for package in "${PACKAGE_ABSOLUTE_PATH_ARRAY[@]}"; do
-    local destination_package_relative_path="${package##${kubernetes_repo_root_dir}/}"
-    local destination_absolute_path="${destination_path}/${destination_package_relative_path}"
+  for kub_package in "${KUB_PACKAGE_ABSOLUTE_PATH_ARRAY[@]}"; do
+    local destination_package_relative_path="${kub_package##${kubernetes_repo_root_dir}/}"
+    local destination_absolute_path="${destination_root_dir}/${destination_package_relative_path}"
 
     mkdir -p "${destination_absolute_path}"
 
     local cp_output
-    cp_output="$(cp "${package}"/* "${destination_absolute_path}" 2>&1)"
+    cp_output="$(cp "${kub_package}"/* "${destination_absolute_path}" 2>&1)"
 
     local non_omit_directory_errors
     non_omit_directory_errors="$(echo "${cp_output}" | grep -v 'omitting directory')"

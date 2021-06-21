@@ -8,7 +8,8 @@ LOG_LEVEL_ALL
 
 main() {
   local kubernetes_repo_root_dir="$1"
-  local destination_path="$2"
+  local component_relative_path="$2"
+  local destination_path="$3"
 
   waitress "${kubernetes_repo_root_dir}" "cmd/kube-apiserver/app/testing/testdata" "${destination_path}"
 }

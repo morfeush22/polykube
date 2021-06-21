@@ -57,3 +57,7 @@ nodes:
 - role: worker
 
 staging packages
+
+generate just deps files
+
+add aggregate targets

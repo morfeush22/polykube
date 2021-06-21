@@ -146,10 +146,10 @@ _migrate_api_common_%:
 	migrators/bar.sh $(KUBERNETES_REPO_ROOT_DIR) pkg/$(*) $(POLYREPO_APIS_DEST_ROOT_DIR)/$(*)
 
 _migrate_binary_component_to_polyrepo_%: _create_binary_component_subdir_% _migrate_binary_component_common_%
-	migrators/binary_components/$(*).sh $(KUBERNETES_REPO_ROOT_DIR) $(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*)
+	migrators/binary_components/$(*).sh $(KUBERNETES_REPO_ROOT_DIR) $($(*)_RELATIVE_SUBPATH) $(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*)
 
 _migrate_integration_test_to_polyrepo_%: _create_integration_test_subdir_% _migrate_integration_test_common_%
-	migrators/integration_tests/$(*).sh $(KUBERNETES_REPO_ROOT_DIR) $(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*)
+	migrators/integration_tests/$(*).sh $(KUBERNETES_REPO_ROOT_DIR) test/integration/$(*) $(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*)
 
 _migrate_api_to_polyrepo_%: _create_api_subdir_% _migrate_api_common_%
-	migrators/apis/$(*).sh $(KUBERNETES_REPO_ROOT_DIR) $(POLYREPO_APIS_DEST_ROOT_DIR)/$(*)
+	migrators/apis/$(*).sh $(KUBERNETES_REPO_ROOT_DIR) pkg/$(*) $(POLYREPO_APIS_DEST_ROOT_DIR)/$(*)
