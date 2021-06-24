@@ -116,9 +116,13 @@ create_binary_components_subdirs: $(KUBERNETES_BINARY_COMPONENTS_SUBDIRS_TARGETS
 create_integration_tests_subdirs: $(KUBERNETES_INTEGRATION_TESTS_SUBDIRS_TARGETS)
 create_apis_subdirs: $(KUBERNETES_APIS_SUBDIRS_TARGETS)
 
+create_all_subdirs: create_binary_components_subdirs create_integration_tests_subdirs create_apis_subdirs
+
 migrate_binary_components_to_polyrepo: $(KUBERNETES_BINARY_COMPONENTS_MIGRATE_TARGETS)
 migrate_integration_tests_to_polyrepo: $(KUBERNETES_INTEGRATION_TESTS_MIGRATE_TARGETS)
 migrate_apis_to_polyrepo: $(KUBERNETES_APIS_MIGRATE_TARGETS)
+
+migrate_all_to_polyrepo: migrate_binary_components_to_polyrepo migrate_integration_tests_to_polyrepo migrate_apis_to_polyrepo
 
 POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR := $(POLYREPO_DEST_ROOT_DIR)/binary_components
 POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR := $(POLYREPO_DEST_ROOT_DIR)/integration_tests

@@ -4,6 +4,8 @@
 source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/../../commons.sh
 source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/../../b-log.sh
 
+readonly MAKEFILE_TEMPLATE_PATH="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/Makefile.tmpl
+
 LOG_LEVEL_ALL
 
 main() {
@@ -17,6 +19,15 @@ main() {
   waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/component-base/featuregate/testing" "${destination_path}"
   waitress "${kubernetes_repo_root_dir}" "vendor/gopkg.in/yaml.v3" "${destination_path}"
   waitress "${kubernetes_repo_root_dir}" "plugin/pkg/auth/authorizer/rbac/bootstrappolicy/testdata" "${destination_path}"
+
+  TEST_TARGETS="
+[
+  \"${component_relative_path}\"
+]
+"
+
+  TEST_TARGETS="${TEST_TARGETS}" \
+    party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
 }
 
 main "$@"

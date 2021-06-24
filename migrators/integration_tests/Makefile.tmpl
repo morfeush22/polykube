@@ -1,0 +1,19 @@
+{{- $test_targets_escaped := dict -}}
+
+{{- range $test_target := (getenv "TEST_TARGETS" | yamlArray) -}}
+
+{{- $p := "" -}}
+{{- if eq $test_target "." -}}
+{{- $p = "./..." -}}
+{{- else -}}
+{{- $p = printf "./%s/..." $test_target -}}
+{{- end -}}
+
+{{- $test_targets_escaped = merge $test_targets_escaped (dict (strings.ReplaceAll "/" "_" $test_target) $p) -}}
+
+{{- end -}}
+
+{{ range $key, $value := $test_targets_escaped -}}
+{{ $key }}:
+	go test {{ $value }}
+{{ end }}

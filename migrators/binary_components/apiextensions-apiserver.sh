@@ -20,7 +20,18 @@ main() {
   waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/code-generator/go.mod" "${destination_path}"
   waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/component-base/go.mod" "${destination_path}"
 
-  TARGET="${component_relative_path}" TEST_TARGET="pkg" \
+  TEST_TARGETS='
+[
+  "pkg"
+]
+'
+
+  ENVS='
+test1: 1
+test2: 2
+'
+
+  TARGET="${component_relative_path}" TEST_TARGETS="${TEST_TARGETS}" ENVS="${ENVS}" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
 }
 
