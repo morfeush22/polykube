@@ -43,9 +43,10 @@ main() {
 
   infer_import_path "${component_relative_path}" import_path
 
-  sed "s#^#${import_path} #" "${deps_file_path}" |
-    cut -f 1,2 -d ' ' \
-      >"${adj_file_path}"
+  cat "${deps_file_path}" |
+    cut -f 1 -d ' ' |
+    grep 'k8s\.io' |
+    sed "s#^#${import_path} #" >"${adj_file_path}"
 }
 
 main "$@"
