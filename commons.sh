@@ -109,6 +109,12 @@ whisky() {
 
   INFO "generated final temporary go deps path is ${final_temp_deps_file_path}"
 
+  local deps_final_path="${polyrepo_dest_root_dir}"/deps.txt
+
+  INFO "copying to final location ${deps_final_path}"
+
+  cp "${final_temp_deps_file_path}" "${deps_final_path}"
+
   bartender "${kubernetes_repo_root_dir}" "${final_temp_deps_file_path}" "${polyrepo_dest_root_dir}"
   waitress "${kubernetes_repo_root_dir}" "${kubernetes_source_relative_path}" "${polyrepo_dest_root_dir}"
   sugar "${kubernetes_repo_root_dir}" "${polyrepo_dest_root_dir}"

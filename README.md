@@ -61,3 +61,12 @@ staging packages
 generate just deps files
 
 add aggregate targets
+
+cut -1
+generate package names: cmd, pkg, integration, staging
+x subdirectories max (cmd/x, pkg/x test/integration/x, etc.)
+save do adj matrix in txt file
+parse file in python
+output graph and txt for each package
+
+generate automatically gocd yaml files
