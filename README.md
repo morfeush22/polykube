@@ -88,3 +88,15 @@ kubernetes_test_import_path = f"{kubernetes_repo_import_path}/test" <- test fram
 kubernetes_third_party_import_path = f"{kubernetes_repo_import_path}/third_party" <- third party Go, not interesting
 
 CI/CD pipelines model?
+
+to filter:
+kube-openapi
+klog
+heapster
+utils
+system-validators
+test/integration/framework
+test/utils
+test/integration
+test/utils/image
+test/integration/util
