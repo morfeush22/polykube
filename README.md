@@ -74,3 +74,5 @@ generate automatically gocd yaml files
 staging
 
 filter third_party in yaml
+
+plugin/pkg
