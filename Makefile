@@ -170,14 +170,24 @@ construct_binary_components_polyrepo_adj_files: $(KUBERNETES_BINARY_COMPONENTS_P
 construct_integration_tests_polyrepo_adj_files: $(KUBERNETES_INTEGRATION_TESTS_POLYREPO_ADJ_FILE_TARGETS)
 construct_apis_polyrepo_adj_files: $(KUBERNETES_APIS_POLYREPO_ADJ_FILE_TARGETS)
 
+ADJ_FILE_NAME             := adj_file.txt
+ADJ_FILE_MERGED_NAME      := adj_file_merged.txt
+AGGR_ADJ_FILE_MERGED_NAME := aggr_adj_file_merged.txt
+
+ADJ_FILE_MERGED_PATH      := $(POLYREPO_DEST_ROOT_DIR)/$(ADJ_FILE_MERGED_NAME)
+AGGR_ADJ_FILE_MERGED_PATH := $(POLYREPO_DEST_ROOT_DIR)/$(AGGR_ADJ_FILE_MERGED_NAME)
+
 _construct_binary_component_polyrepo_adj_file_%:
-	./adj.sh $(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*) $($(*)_RELATIVE_SUBPATH)
+	./adj.sh $(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*) $($(*)_RELATIVE_SUBPATH) $(ADJ_FILE_NAME)
 
 _construct_integration_test_polyrepo_adj_file_%:
-	./adj.sh $(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*) test/integration/$(*)
+	./adj.sh $(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*) test/integration/$(*) $(ADJ_FILE_NAME)
 
 _construct_api_polyrepo_adj_file_%:
-	./adj.sh $(POLYREPO_APIS_DEST_ROOT_DIR)/$(*) pkg/$(*)
+	./adj.sh $(POLYREPO_APIS_DEST_ROOT_DIR)/$(*) pkg/$(*) $(ADJ_FILE_NAME)
+
+VENV_PATH := ./venv
 
 construct_all_polyrepo_adj_files: construct_binary_components_polyrepo_adj_files construct_integration_tests_polyrepo_adj_files construct_apis_polyrepo_adj_files
-	find $(POLYREPO_DEST_ROOT_DIR) -maxdepth 3 -name "adj_file.txt" | xargs cat | sort > $(POLYREPO_DEST_ROOT_DIR)/adj_file_merged.txt
+	find $(POLYREPO_DEST_ROOT_DIR) -maxdepth 3 -name "$(ADJ_FILE_NAME)" | xargs cat | sort > $(ADJ_FILE_MERGED_PATH)
+	$(VENV_PATH)/bin/python ./conv-adj.py $(ADJ_FILE_MERGED_PATH) $(AGGR_ADJ_FILE_MERGED_PATH)

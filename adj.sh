@@ -33,9 +33,10 @@ infer_import_path() {
 main() {
   local polyrepo_dest_root_dir="$1"
   local component_relative_path="$2"
+  local adj_file_name="$3"
 
   local deps_file_path="${polyrepo_dest_root_dir}"/deps.txt
-  local adj_file_path="${polyrepo_dest_root_dir}"/adj_file.txt
+  local adj_file_path="${polyrepo_dest_root_dir}/${adj_file_name}"
 
   local component_absolute_path="${polyrepo_dest_root_dir}/${component_relative_path}"
 
@@ -45,7 +46,7 @@ main() {
 
   cat "${deps_file_path}" |
     cut -f 1 -d ' ' |
-    grep 'k8s\.io' |
+    grep '^k8s\.io' |
     sed "s#^#${import_path} #" >"${adj_file_path}"
 }
 
