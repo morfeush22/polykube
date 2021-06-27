@@ -76,3 +76,13 @@ staging
 filter third_party in yaml
 
 plugin/pkg
+
+kubernetes_repo_import_path = "k8s.io/kubernetes" <- umbrella, not interesting
+kubernetes_staging_import_path = "k8s.io" <- staging, OK
+
+kubernetes_test_integration_import_path = f"{kubernetes_repo_import_path}/test/integration" <- OK
+kubernetes_plugin_import_path = f"{kubernetes_repo_import_path}/plugin/pkg" <- OK
+kubernetes_cmd_import_path = f"{kubernetes_repo_import_path}/cmd" <- OK
+kubernetes_pkg_import_path = f"{kubernetes_repo_import_path}/pkg" <- OK
+kubernetes_test_import_path = f"{kubernetes_repo_import_path}/test" <- test framework, not interesting
+kubernetes_third_party_import_path = f"{kubernetes_repo_import_path}/third_party" <- third party Go, not interesting
