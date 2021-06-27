@@ -19,6 +19,7 @@ def aggr_adj(label):
     kubernetes_cmd_import_path = f"{kubernetes_repo_import_path}/cmd"
     kubernetes_pkg_import_path = f"{kubernetes_repo_import_path}/pkg"
     kubernetes_test_import_path = f"{kubernetes_repo_import_path}/test"
+    kubernetes_third_party_import_path = f"{kubernetes_repo_import_path}/third_party"
 
     # from most specific one...
     if label.startswith(kubernetes_test_integration_import_path):
@@ -31,6 +32,9 @@ def aggr_adj(label):
         return filter_adj_to_n_depth(label, 4)
     elif label.startswith(kubernetes_test_import_path):
         return filter_adj_to_n_depth(label, 4)
+    elif label.startswith(kubernetes_third_party_import_path):
+        logging.info(f"using less specific path spec for {label}")
+        return filter_adj_to_n_depth(label, 3)
     elif label.startswith(kubernetes_staging_import_path):
         logging.info(f"using less specific path spec for {label}")
         return filter_adj_to_n_depth(label, 2)
