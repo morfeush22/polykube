@@ -6,7 +6,7 @@ LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
 logging.basicConfig(level=LOGLEVEL)
 
 
-def filter_adj_to_n_depth(label, n):
+def filter_adj_to_n_depth(label, n=None):
     return "/".join(label.split("/")[:n])
 
 
@@ -18,7 +18,6 @@ def aggr_adj(label):
     kubernetes_plugin_import_path = f"{kubernetes_repo_import_path}/plugin/pkg"
     kubernetes_cmd_import_path = f"{kubernetes_repo_import_path}/cmd"
     kubernetes_pkg_import_path = f"{kubernetes_repo_import_path}/pkg"
-    kubernetes_test_import_path = f"{kubernetes_repo_import_path}/test"
     kubernetes_third_party_import_path = f"{kubernetes_repo_import_path}/third_party"
 
     # from most specific one...
@@ -30,16 +29,16 @@ def aggr_adj(label):
         return filter_adj_to_n_depth(label, 4)
     elif label.startswith(kubernetes_pkg_import_path):
         return filter_adj_to_n_depth(label, 4)
-    elif label.startswith(kubernetes_test_import_path):
-        return filter_adj_to_n_depth(label, 4)
     elif label.startswith(kubernetes_third_party_import_path):
-        logging.info(f"using less specific path spec for {label}")
         return filter_adj_to_n_depth(label, 3)
+    elif label.startswith(kubernetes_repo_import_path):
+        logging.info(f"using less specific {kubernetes_repo_import_path} path spec for {label}")
+        return filter_adj_to_n_depth(label)
     elif label.startswith(kubernetes_staging_import_path):
-        logging.info(f"using less specific path spec for {label}")
+        logging.info(f"using less specific {kubernetes_staging_import_path} path spec for {label}")
         return filter_adj_to_n_depth(label, 2)
     else:
-        logging.warning(f"do not know how to aggregate {label.strip()}")
+        logging.warning(f"do not know how to aggregate {label}")
 
     return ""
 
