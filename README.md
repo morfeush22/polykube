@@ -72,3 +72,5 @@ output graph and txt for each package
 generate automatically gocd yaml files
 
 staging
+
+filter third_party in yaml
