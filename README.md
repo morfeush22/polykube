@@ -151,4 +151,6 @@ File "/home/morfeush22/Projects/masters/kub/venv/lib/python3.9/site-packages/net
 raise ImportError("requires pygraphviz " "http://pygraphviz.github.io/") from e
 ImportError: requires pygraphviz http://pygraphviz.github.io/
 >>> write_dot(graph, "./dot.graph")
->>> 
+>>> sgraph=x.edge_subgraph(graph, x.edges(graph, ["k8s.io/kubernetes/pkg/scheduler"]))
+>>> write_dot(sgraph, "./dot.graph")
+sfdp -x -Goverlap=scale -Tpng dot.graph > data.png
