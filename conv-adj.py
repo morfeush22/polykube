@@ -80,9 +80,9 @@ def remove_self_ref_labels(labels):
     return filtered_labels
 
 
-def save_aggr_labels_to_file(aggr_adj_file_merged_dest_path, labels):
+def save_aggr_labels_to_file(aggr_adj_file_merged_handle, labels):
     for label in sorted(labels):
-        aggr_adj_file_merged_dest_path.write(f"{label}\n")
+        aggr_adj_file_merged_handle.write(f"{label}\n")
 
 
 def main():

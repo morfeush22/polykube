@@ -81,8 +81,12 @@ def not_important_package(dst_import_path):
 
 
 def verify_import_paths(aggr_adj_file_merged_handle, type_to_root_dir):
+    verified_import_paths = []
+
     for line in aggr_adj_file_merged_handle:
-        import_paths = line.strip().split(" ")
+        line_stripped = line.strip()
+
+        import_paths = line_stripped.split(" ")
 
         src_import_path = import_paths[0]
         dst_import_path = import_paths[1]
@@ -97,6 +101,15 @@ def verify_import_paths(aggr_adj_file_merged_handle, type_to_root_dir):
         verify_dir_exists(f"{type_to_root_dir[src_type]}/{src_subdir}")
         verify_dir_exists(f"{type_to_root_dir[dst_type]}/{dst_subdir}")
 
+        verified_import_paths.append(line_stripped)
+
+    return verified_import_paths
+
+
+def save_aggr_labels_to_file(filtered_aggr_adj_file_merged_handle, verified_import_paths):
+    for import_path in sorted(verified_import_paths):
+        filtered_aggr_adj_file_merged_handle.write(f"{import_path}\n")
+
 
 def main():
     polyrepo_binary_components_dest_root_dir = sys.argv[1]
@@ -105,6 +118,7 @@ def main():
     polyrepo_plugins_dest_root_dir = sys.argv[4]
     polyrepo_staging_dest_root_dir = sys.argv[5]
     aggr_adj_file_merged_path = sys.argv[6]
+    filtered_aggr_adj_file_merged_dest_path = sys.argv[7]
 
     type_to_root_dir = {
         BINARY_COMPONENT: polyrepo_binary_components_dest_root_dir,
@@ -115,7 +129,10 @@ def main():
     }
 
     with open(aggr_adj_file_merged_path, "r") as aggr_adj_file_merged_handle:
-        verify_import_paths(aggr_adj_file_merged_handle, type_to_root_dir)
+        verified_import_paths = verify_import_paths(aggr_adj_file_merged_handle, type_to_root_dir)
+
+    with open(filtered_aggr_adj_file_merged_dest_path, "w") as filtered_aggr_adj_file_merged_handle:
+        save_aggr_labels_to_file(filtered_aggr_adj_file_merged_handle, verified_import_paths)
 
 
 if __name__ == '__main__':

@@ -255,12 +255,14 @@ construct_apis_polyrepo_adj_files: $(KUBERNETES_APIS_POLYREPO_ADJ_FILE_TARGETS)
 construct_plugins_polyrepo_adj_files: $(KUBERNETES_PLUGINS_POLYREPO_ADJ_FILE_TARGETS)
 construct_staging_polyrepo_adj_files: $(KUBERNETES_STAGING_POLYREPO_ADJ_FILE_TARGETS)
 
-ADJ_FILE_NAME             := adj_file.txt
-ADJ_FILE_MERGED_NAME      := adj_file_merged.txt
-AGGR_ADJ_FILE_MERGED_NAME := aggr_adj_file_merged.txt
+ADJ_FILE_NAME                      := adj_file.txt
+ADJ_FILE_MERGED_NAME               := adj_file_merged.txt
+AGGR_ADJ_FILE_MERGED_NAME          := aggr_adj_file_merged.txt
+FILTERED_AGGR_ADJ_FILE_MERGED_NAME := filtered_aggr_adj_file_merged.txt
 
-ADJ_FILE_MERGED_PATH      := $(POLYREPO_DEST_ROOT_DIR)/$(ADJ_FILE_MERGED_NAME)
-AGGR_ADJ_FILE_MERGED_PATH := $(POLYREPO_DEST_ROOT_DIR)/$(AGGR_ADJ_FILE_MERGED_NAME)
+ADJ_FILE_MERGED_PATH               := $(POLYREPO_DEST_ROOT_DIR)/$(ADJ_FILE_MERGED_NAME)
+AGGR_ADJ_FILE_MERGED_PATH          := $(POLYREPO_DEST_ROOT_DIR)/$(AGGR_ADJ_FILE_MERGED_NAME)
+FILTERED_AGGR_ADJ_FILE_MERGED_PATH := $(POLYREPO_DEST_ROOT_DIR)/$(FILTERED_AGGR_ADJ_FILE_MERGED_NAME)
 
 _construct_binary_component_polyrepo_adj_file_%:
 	./adj.sh $(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*) $($(*)_RELATIVE_SUBPATH) $(ADJ_FILE_NAME)
@@ -286,11 +288,12 @@ construct_all_polyrepo_adj_files: construct_binary_components_polyrepo_adj_files
 make-all:
 	./make-all.sh $(POLYREPO_DEST_ROOT_DIR)
 
-analyse-deps:
-	$(VENV_PATH)/bin/python ./pac-deps.py \
+filter-deps:
+	$(VENV_PATH)/bin/python ./filter-deps.py \
 		$(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR) \
 		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR) \
 		$(POLYREPO_APIS_DEST_ROOT_DIR) \
 		$(POLYREPO_PLUGINS_DEST_ROOT_DIR) \
 		$(POLYREPO_STAGING_DEST_ROOT_DIR) \
-		$(AGGR_ADJ_FILE_MERGED_PATH)
+		$(AGGR_ADJ_FILE_MERGED_PATH) \
+		$(FILTERED_AGGR_ADJ_FILE_MERGED_PATH)
