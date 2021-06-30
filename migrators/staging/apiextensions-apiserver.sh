@@ -8,7 +8,6 @@ readonly MAKEFILE_TEMPLATE_PATH="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/M
 
 LOG_LEVEL_ALL
 
-#TODO delete, handled in bin comp
 main() {
   local kubernetes_repo_root_dir="$1"
   local component_relative_path="$2"

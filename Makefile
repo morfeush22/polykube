@@ -2,7 +2,6 @@ KUBERNETES_REPO_ROOT_DIR := $(HOME)/Projects/kubernetes
 POLYREPO_DEST_ROOT_DIR   := $(HOME)/Projects/masters/polyrepo
 
 KUBERNETES_BINARY_COMPONENTS := \
-	apiextensions-apiserver \
 	kubeadm \
 	kube-aggregator \
 	kube-apiserver \
@@ -120,7 +119,6 @@ KUBERNETES_STAGING := \
 	cri-api \
 	csi-translation-lib \
 	kube-aggregator \
-	kube-controller-manager \
 	kube-proxy \
 	kube-scheduler \
 	kubectl \
@@ -284,3 +282,15 @@ VENV_PATH := ./venv
 construct_all_polyrepo_adj_files: construct_binary_components_polyrepo_adj_files construct_integration_tests_polyrepo_adj_files construct_apis_polyrepo_adj_files
 	find $(POLYREPO_DEST_ROOT_DIR) -maxdepth 3 -name "$(ADJ_FILE_NAME)" | xargs cat | sort > $(ADJ_FILE_MERGED_PATH)
 	$(VENV_PATH)/bin/python ./conv-adj.py $(ADJ_FILE_MERGED_PATH) $(AGGR_ADJ_FILE_MERGED_PATH)
+
+make-all:
+	./make-all.sh $(POLYREPO_DEST_ROOT_DIR)
+
+analyse-deps:
+	$(VENV_PATH)/bin/python ./pac-deps.py \
+		$(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR) \
+		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR) \
+		$(POLYREPO_APIS_DEST_ROOT_DIR) \
+		$(POLYREPO_PLUGINS_DEST_ROOT_DIR) \
+		$(POLYREPO_STAGING_DEST_ROOT_DIR) \
+		$(AGGR_ADJ_FILE_MERGED_PATH)

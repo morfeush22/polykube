@@ -56,10 +56,10 @@ def aggr_adjs(line):
     return create_label(aggr_adj(src), aggr_adj(dst))
 
 
-def infer_aggr_adj_labels(adf_file_merged_handle):
+def infer_aggr_adj_labels(adj_file_merged_handle):
     labels = []
 
-    for line in adf_file_merged_handle:
+    for line in adj_file_merged_handle:
         labels.append(aggr_adjs(line))
 
     return set(labels)
@@ -89,8 +89,8 @@ def main():
     adj_file_merged_path = sys.argv[1]
     aggr_adj_file_merged_dest_path = sys.argv[2]
 
-    with open(adj_file_merged_path, "r") as adf_file_merged_handle:
-        labels = infer_aggr_adj_labels(adf_file_merged_handle)
+    with open(adj_file_merged_path, "r") as adj_file_merged_handle:
+        labels = infer_aggr_adj_labels(adj_file_merged_handle)
 
     filtered_labels = remove_self_ref_labels(labels)
 
