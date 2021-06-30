@@ -237,13 +237,13 @@ _migrate_plugin_to_polyrepo_%: _create_plugin_subdir_% _migrate_plugin_common_%
 	migrators/plugins/$(*).sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		plugin/pkg/$(*) \
-		$(POLYREPO_APIS_DEST_ROOT_DIR)/$(*)
+		$(POLYREPO_PLUGINS_DEST_ROOT_DIR)/$(*)
 
 _migrate_staging_to_polyrepo_%: _create_staging_subdir_% _migrate_staging_common_%
 	migrators/staging/$(*).sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		staging/src/k8s.io/$(*) \
-		$(POLYREPO_APIS_DEST_ROOT_DIR)/$(*)
+		$(POLYREPO_STAGING_DEST_ROOT_DIR)/$(*)
 
 KUBERNETES_BINARY_COMPONENTS_POLYREPO_ADJ_FILE_TARGETS := $(addprefix _construct_binary_component_polyrepo_adj_file_,$(KUBERNETES_BINARY_COMPONENTS))
 KUBERNETES_INTEGRATION_TESTS_POLYREPO_ADJ_FILE_TARGETS := $(addprefix _construct_integration_test_polyrepo_adj_file_,$(KUBERNETES_INTEGRATION_TESTS))

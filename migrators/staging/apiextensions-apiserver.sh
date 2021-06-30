@@ -8,10 +8,18 @@ readonly MAKEFILE_TEMPLATE_PATH="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/M
 
 LOG_LEVEL_ALL
 
+#TODO delete, handled in bin comp
 main() {
   local kubernetes_repo_root_dir="$1"
   local component_relative_path="$2"
   local destination_path="$3"
+
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/api" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/apimachinery" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/apiserver" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/client-go" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/code-generator/go.mod" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/component-base" "${destination_path}"
 
   TARGETS="[${component_relative_path}]" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"

@@ -100,3 +100,9 @@ test/utils
 test/integration
 test/utils/image
 test/integration/util
+
+filter and map import paths from aggr adj file to directories
+
+test-cmd
+
+unit -> int -> cmd -> e2e

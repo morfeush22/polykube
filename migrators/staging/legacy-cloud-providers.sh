@@ -13,6 +13,15 @@ main() {
   local component_relative_path="$2"
   local destination_path="$3"
 
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/api" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/apimachinery" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/apiserver" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/client-go" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/cloud-provider" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/component-base" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/csi-translation-lib" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/controller-manager/go.mod" "${destination_path}"
+
   TARGETS="[${component_relative_path}]" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
 }

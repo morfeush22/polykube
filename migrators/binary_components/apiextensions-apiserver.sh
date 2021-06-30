@@ -20,6 +20,7 @@ main() {
   waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/code-generator/go.mod" "${destination_path}"
   waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/component-base/go.mod" "${destination_path}"
 
+#TODO fix, wrong path
   TEST_TARGETS='
 [
   "pkg"
