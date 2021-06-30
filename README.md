@@ -108,3 +108,47 @@ test-cmd
 unit -> int -> cmd -> e2e
 
 removed packages that have no tests
+
+Python 3.9.5 (default, May 24 2021, 12:50:35)
+[GCC 11.1.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import networkx as x
+>>> x.re
+x.reaching                    x.read_graph6(                x.read_sparse6(               x.recursive_simple_cycles(    x.release                     x.restricted_view(
+x.read_adjlist(               x.read_graphml(               x.read_weighted_edgelist(     x.regular                     x.reportviews                 x.reverse(
+x.read_edgelist(              x.read_leda(                  x.read_yaml(                  x.relabel                     x.rescale_layout(             x.reverse_view(
+x.read_gexf(                  x.read_multiline_adjlist(     x.readwrite                   x.relabel_gexf_graph(         x.rescale_layout_dict(        
+x.read_gml(                   x.read_pajek(                 x.reciprocity(                x.relabel_nodes(              x.resistance_distance(        
+x.read_gpickle(               x.read_shp(                   x.reconstruct_path(           x.relaxed_caveman_graph(      x.resource_allocation_index(  
+>>> x.re
+x.reaching                    x.read_graph6(                x.read_sparse6(               x.recursive_simple_cycles(    x.release                     x.restricted_view(
+x.read_adjlist(               x.read_graphml(               x.read_weighted_edgelist(     x.regular                     x.reportviews                 x.reverse(
+x.read_edgelist(              x.read_leda(                  x.read_yaml(                  x.relabel                     x.rescale_layout(             x.reverse_view(
+x.read_gexf(                  x.read_multiline_adjlist(     x.readwrite                   x.relabel_gexf_graph(         x.rescale_layout_dict(        
+x.read_gml(                   x.read_pajek(                 x.reciprocity(                x.relabel_nodes(              x.resistance_distance(        
+x.read_gpickle(               x.read_shp(                   x.reconstruct_path(           x.relaxed_caveman_graph(      x.resource_allocation_index(  
+>>> x.read_adjlist("/home/morfeush22/Projects/masters/polyrepo/filtered_aggr_adj_file_merged.txt")
+<networkx.classes.graph.Graph object at 0x7efca52f7100>
+>>> graph = x.read_adjlist("/home/morfeush22/Projects/masters/polyrepo/filtered_aggr_adj_file_merged.txt")
+>>> x.write_
+x.write_adjlist(            x.write_gml(                x.write_graphml(            x.write_multiline_adjlist(  x.write_sparse6(            
+x.write_edgelist(           x.write_gpickle(            x.write_graphml_lxml(       x.write_pajek(              x.write_weighted_edgelist(  
+x.write_gexf(               x.write_graph6(             x.write_graphml_xml(        x.write_shp(                x.write_yaml(               
+>>> from networkx.drawing.nx_agraph import write_dot
+>>> write_dot(graph, "./dot.graph")
+Traceback (most recent call last):
+File "/home/morfeush22/Projects/masters/kub/venv/lib/python3.9/site-packages/networkx/drawing/nx_agraph.py", line 130, in to_agraph
+import pygraphviz
+ModuleNotFoundError: No module named 'pygraphviz'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+File "<stdin>", line 1, in <module>
+File "/home/morfeush22/Projects/masters/kub/venv/lib/python3.9/site-packages/networkx/drawing/nx_agraph.py", line 183, in write_dot
+A = to_agraph(G)
+File "/home/morfeush22/Projects/masters/kub/venv/lib/python3.9/site-packages/networkx/drawing/nx_agraph.py", line 132, in to_agraph
+raise ImportError("requires pygraphviz " "http://pygraphviz.github.io/") from e
+ImportError: requires pygraphviz http://pygraphviz.github.io/
+>>> write_dot(graph, "./dot.graph")
+>>> 
