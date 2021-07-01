@@ -63,6 +63,23 @@ bartender() {
     "${destination_root_dir}"
 }
 
+twin() {
+  local destination_root_dir="$1"
+  local source_relative_path="$2"
+  local destination_relative_path="$3"
+
+  local src_abs_path="${destination_root_dir}/${source_relative_path}"
+  local dst_abs_path="${destination_root_dir}/${destination_relative_path}"
+
+  local dest_dir="${dst_abs_path%/*}"
+
+  if [[ ! -d "${dest_dir}" ]]; then
+    mkdir -p "${dest_dir}"
+  fi
+
+  ln -s "${src_abs_path}" "${dst_abs_path}"
+}
+
 waitress() {
   local kubernetes_repo_root_dir="$1"
   local kubernetes_source_relative_path="$2"

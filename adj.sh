@@ -15,9 +15,7 @@ infer_import_path() {
 
   local candidate_import_path
 
-  if [[ "${component_relative_path}" == 'staging/src/k8s.io/apiextensions-apiserver/test/integration' ]]; then
-    inferred_import_path="k8s.io/apiextensions-apiserver/test/integration"
-  elif candidate_import_path="$(go list)"; then
+  if candidate_import_path="$(go list)"; then
     inferred_import_path="${candidate_import_path}"
   else
     WARN "trying to infer import path for ${component_relative_path}"
