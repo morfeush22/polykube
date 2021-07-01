@@ -3,6 +3,6 @@ all: {{ join $targets " " | strings.ReplaceAll "/" "_" }}
 
 {{ range $_, $target := $targets }}
 {{- strings.ReplaceAll "/" "_" $target -}}:
-	go test ./{{ $target }}/...
+	cd {{ $target }} && go test ./...
 
 {{ end -}}

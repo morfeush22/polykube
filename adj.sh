@@ -15,14 +15,18 @@ infer_import_path() {
 
   local candidate_import_path
 
-  if candidate_import_path="$(go list)"; then
+  if [[ "${component_relative_path}" == 'staging/src/k8s.io/apiextensions-apiserver/test/integration' ]]; then
+    inferred_import_path="k8s.io/apiextensions-apiserver/test/integration"
+  elif candidate_import_path="$(go list)"; then
     inferred_import_path="${candidate_import_path}"
   else
     WARN "trying to infer import path for ${component_relative_path}"
 
-    local -r kubernetes_module_spec='k8s.io/kubernetes'
-
-    inferred_import_path="${kubernetes_module_spec}/${component_relative_path}"
+    if [[ "${component_relative_path}" == 'staging/src/k8s.io/'* ]]; then
+      inferred_import_path="k8s.io/${component_relative_path##staging/src/k8s.io/}"
+    else
+      inferred_import_path="k8s.io/kubernetes/${component_relative_path}"
+    fi
 
     WARN "inferred path is ${inferred_import_path}"
   fi

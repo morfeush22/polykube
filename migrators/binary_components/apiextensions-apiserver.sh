@@ -9,32 +9,25 @@ readonly MAKEFILE_TEMPLATE_PATH="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/M
 LOG_LEVEL_ALL
 
 main() {
-# handled inside staging
-#  local kubernetes_repo_root_dir="$1"
-#  local component_relative_path="$2"
-#  local destination_path="$3"
-#
-#  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/api/go.mod" "${destination_path}"
-#  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/apimachinery/go.mod" "${destination_path}"
-#  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/apiserver/go.mod" "${destination_path}"
-#  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/client-go/go.mod" "${destination_path}"
-#  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/code-generator/go.mod" "${destination_path}"
-#  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/component-base/go.mod" "${destination_path}"
-#
-##TODO fix, wrong path
-#  TEST_TARGETS='
-#[
-#  "pkg"
-#]
-#'
-#
-#  ENVS='
-#test1: 1
-#test2: 2
-#'
-#
-#  TARGET="${component_relative_path}" TEST_TARGETS="${TEST_TARGETS}" ENVS="${ENVS}" \
-#    party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
+  local kubernetes_repo_root_dir="$1"
+  local component_relative_path="$2"
+  local destination_path="$3"
+
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/api" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/apimachinery" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/apiserver" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/client-go" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/code-generator" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/component-base" "${destination_path}"
+
+  TEST_TARGETS="
+[
+  \"${component_relative_path}/pkg\"
+]
+"
+
+  TARGET="${component_relative_path}" TEST_TARGETS="${TEST_TARGETS}" \
+    party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
 }
 
 main "$@"

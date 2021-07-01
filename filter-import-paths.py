@@ -21,6 +21,7 @@ def infer_type_and_subdir(import_path):
     apis_import_path = f"{kubernetes_repo_import_path}/pkg"
     plugins_import_path = f"{kubernetes_repo_import_path}/plugin/pkg"
     staging_import_path = "k8s.io"
+    kubernetes_apiextensions_apiserver_test_integration_import_path = f"{staging_import_path}/apiextensions-apiserver/test/integration"
 
     if import_path.startswith(binary_components_import_path):
         return BINARY_COMPONENT, import_path.removeprefix(f"{binary_components_import_path}/")
@@ -30,6 +31,8 @@ def infer_type_and_subdir(import_path):
         return API, import_path.removeprefix(f"{apis_import_path}/")
     elif import_path.startswith(plugins_import_path):
         return PLUGIN, import_path.removeprefix(f"{plugins_import_path}/")
+    elif import_path.startswith(kubernetes_apiextensions_apiserver_test_integration_import_path):
+        return INTEGRATION_TEST, "apiextensions-apiserver"
     elif import_path.startswith(staging_import_path):
         return STAGING, import_path.removeprefix(f"{staging_import_path}/")
     else:

@@ -2,6 +2,7 @@ KUBERNETES_REPO_ROOT_DIR := $(HOME)/Projects/kubernetes
 POLYREPO_DEST_ROOT_DIR   := $(HOME)/Projects/masters/polyrepo
 
 KUBERNETES_BINARY_COMPONENTS := \
+	apiextensions-apiserver \
 	kubeadm \
 	kube-aggregator \
 	kube-apiserver \
@@ -13,9 +14,9 @@ KUBERNETES_BINARY_COMPONENTS := \
 	kube-scheduler \
 	mounter
 
-apiextensions-apiserver_RELATIVE_SUBPATH := vendor/k8s.io/apiextensions-apiserver
+apiextensions-apiserver_RELATIVE_SUBPATH := staging/src/k8s.io/apiextensions-apiserver
 kubeadm_RELATIVE_SUBPATH                 := cmd/kubeadm
-kube-aggregator_RELATIVE_SUBPATH         := vendor/k8s.io/kube-aggregator
+kube-aggregator_RELATIVE_SUBPATH         := staging/src/k8s.io/kube-aggregator
 kube-apiserver_RELATIVE_SUBPATH          := cmd/kube-apiserver
 kube-controller-manager_RELATIVE_SUBPATH := cmd/kube-controller-manager
 kubectl_RELATIVE_SUBPATH                 := cmd/kubectl
@@ -26,6 +27,7 @@ kube-scheduler_RELATIVE_SUBPATH          := cmd/kube-scheduler
 mounter_RELATIVE_SUBPATH                 := cluster/gce/gci/mounter
 
 KUBERNETES_INTEGRATION_TESTS := \
+	apiextensions-apiserver \
 	apimachinery \
 	apiserver \
 	auth \
@@ -142,7 +144,7 @@ KUBERNETES_PLUGINS_MIGRATE_TARGETS := $(addprefix _migrate_plugin_to_polyrepo_,$
 KUBERNETES_STAGING_SUBDIRS_TARGETS := $(addprefix _create_staging_subdir_,$(KUBERNETES_STAGING))
 KUBERNETES_STAGING_MIGRATE_TARGETS := $(addprefix _migrate_staging_to_polyrepo_,$(KUBERNETES_STAGING))
 
-SHELL = bash
+SHELL := bash
 
 create_binary_components_subdirs: $(KUBERNETES_BINARY_COMPONENTS_SUBDIRS_TARGETS)
 create_integration_tests_subdirs: $(KUBERNETES_INTEGRATION_TESTS_SUBDIRS_TARGETS)
@@ -199,19 +201,40 @@ _create_staging_subdir_%:
 	mkdir -p $(POLYREPO_STAGING_DEST_ROOT_DIR)/$(*)
 
 _migrate_binary_component_common_%:
-	migrators/bar.sh $(KUBERNETES_REPO_ROOT_DIR) $($(*)_RELATIVE_SUBPATH) $(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*)
+	migrators/bar.sh \
+		$(KUBERNETES_REPO_ROOT_DIR) \
+		$($(*)_RELATIVE_SUBPATH) \
+		$(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*)
 
 _migrate_integration_test_common_%:
-	migrators/bar.sh $(KUBERNETES_REPO_ROOT_DIR) test/integration/$(*) $(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*)
+	migrators/bar.sh \
+		$(KUBERNETES_REPO_ROOT_DIR) \
+		test/integration/$(*) \
+		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*)
+
+_migrate_integration_test_common_apiextensions-apiserver:
+	migrators/bar.sh \
+		$(KUBERNETES_REPO_ROOT_DIR) \
+		$(apiextensions-apiserver_RELATIVE_SUBPATH)/test/integration \
+		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/apiextensions-apiserver
 
 _migrate_api_common_%:
-	migrators/bar.sh $(KUBERNETES_REPO_ROOT_DIR) pkg/$(*) $(POLYREPO_APIS_DEST_ROOT_DIR)/$(*)
+	migrators/bar.sh \
+		$(KUBERNETES_REPO_ROOT_DIR) \
+		pkg/$(*) \
+		$(POLYREPO_APIS_DEST_ROOT_DIR)/$(*)
 
 _migrate_plugin_common_%:
-	migrators/bar.sh $(KUBERNETES_REPO_ROOT_DIR) plugin/pkg/$(*) $(POLYREPO_PLUGINS_DEST_ROOT_DIR)/$(*)
+	migrators/bar.sh \
+		$(KUBERNETES_REPO_ROOT_DIR) \
+		plugin/pkg/$(*) \
+		$(POLYREPO_PLUGINS_DEST_ROOT_DIR)/$(*)
 
 _migrate_staging_common_%:
-	migrators/bar.sh $(KUBERNETES_REPO_ROOT_DIR) staging/src/k8s.io/$(*) $(POLYREPO_STAGING_DEST_ROOT_DIR)/$(*)
+	migrators/bar.sh \
+		$(KUBERNETES_REPO_ROOT_DIR) \
+		staging/src/k8s.io/$(*) \
+		$(POLYREPO_STAGING_DEST_ROOT_DIR)/$(*)
 
 _migrate_binary_component_to_polyrepo_%: _create_binary_component_subdir_% _migrate_binary_component_common_%
 	migrators/binary_components/$(*).sh \
@@ -224,6 +247,13 @@ _migrate_integration_test_to_polyrepo_%: _create_integration_test_subdir_% _migr
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		test/integration/$(*) \
 		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*)
+
+_migrate_integration_test_to_polyrepo_apiextensions-apiserver: _migrate_integration_test_common_apiextensions-apiserver
+_migrate_integration_test_to_polyrepo_apiextensions-apiserver: _create_integration_test_subdir_apiextensions-apiserver
+	migrators/integration_tests/apiextensions-apiserver.sh \
+		$(KUBERNETES_REPO_ROOT_DIR) \
+		$(apiextensions-apiserver_RELATIVE_SUBPATH)/test/integration \
+		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/apiextensions-apiserver
 
 _migrate_api_to_polyrepo_%: _create_api_subdir_% _migrate_api_common_%
 	migrators/apis/$(*).sh \
@@ -265,31 +295,56 @@ AGGR_ADJ_FILE_MERGED_PATH          := $(POLYREPO_DEST_ROOT_DIR)/$(AGGR_ADJ_FILE_
 FILTERED_AGGR_ADJ_FILE_MERGED_PATH := $(POLYREPO_DEST_ROOT_DIR)/$(FILTERED_AGGR_ADJ_FILE_MERGED_NAME)
 
 _construct_binary_component_polyrepo_adj_file_%:
-	./adj.sh $(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*) $($(*)_RELATIVE_SUBPATH) $(ADJ_FILE_NAME)
+	./adj.sh \
+		$(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*) \
+		$($(*)_RELATIVE_SUBPATH) \
+		$(ADJ_FILE_NAME)
 
 _construct_integration_test_polyrepo_adj_file_%:
-	./adj.sh $(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*) test/integration/$(*) $(ADJ_FILE_NAME)
+	./adj.sh \
+		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*) \
+		test/integration/$(*) \
+		$(ADJ_FILE_NAME)
+
+_construct_integration_test_polyrepo_adj_file_apiextensions-apiserver:
+	./adj.sh \
+		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/apiextensions-apiserver \
+		$(apiextensions-apiserver_RELATIVE_SUBPATH)/test/integration \
+		$(ADJ_FILE_NAME)
 
 _construct_api_polyrepo_adj_file_%:
-	./adj.sh $(POLYREPO_APIS_DEST_ROOT_DIR)/$(*) pkg/$(*) $(ADJ_FILE_NAME)
+	./adj.sh \
+		$(POLYREPO_APIS_DEST_ROOT_DIR)/$(*) \
+		pkg/$(*) \
+		$(ADJ_FILE_NAME)
 
 _construct_plugin_polyrepo_adj_file_%:
-	./adj.sh $(POLYREPO_APIS_DEST_ROOT_DIR)/$(*) plugin/pkg/$(*) $(ADJ_FILE_NAME)
+	./adj.sh \
+		$(POLYREPO_PLUGINS_DEST_ROOT_DIR)/$(*) \
+		plugin/pkg/$(*) \
+		$(ADJ_FILE_NAME)
 
 _construct_staging_polyrepo_adj_file_%:
-	./adj.sh $(POLYREPO_APIS_DEST_ROOT_DIR)/$(*) staging/src/k8s.io/$(*) $(ADJ_FILE_NAME)
+	./adj.sh \
+		$(POLYREPO_STAGING_DEST_ROOT_DIR)/$(*) \
+		staging/src/k8s.io/$(*) \
+		$(ADJ_FILE_NAME)
 
 VENV_PATH := ./venv
 
-construct_all_polyrepo_adj_files: construct_binary_components_polyrepo_adj_files construct_integration_tests_polyrepo_adj_files construct_apis_polyrepo_adj_files
+construct_all_polyrepo_adj_files: construct_binary_components_polyrepo_adj_files
+construct_all_polyrepo_adj_files: construct_integration_tests_polyrepo_adj_files
+construct_all_polyrepo_adj_files: construct_apis_polyrepo_adj_files
+construct_all_polyrepo_adj_files: construct_plugins_polyrepo_adj_files
+construct_all_polyrepo_adj_files: construct_staging_polyrepo_adj_files
+
+aggr_import_paths:
 	find $(POLYREPO_DEST_ROOT_DIR) -maxdepth 3 -name "$(ADJ_FILE_NAME)" | xargs cat | sort > $(ADJ_FILE_MERGED_PATH)
-	$(VENV_PATH)/bin/python ./conv-adj.py $(ADJ_FILE_MERGED_PATH) $(AGGR_ADJ_FILE_MERGED_PATH)
+	$(VENV_PATH)/bin/python ./aggr-import-paths.py $(ADJ_FILE_MERGED_PATH) $(AGGR_ADJ_FILE_MERGED_PATH)
 
-make-all:
-	./make-all.sh $(POLYREPO_DEST_ROOT_DIR)
-
-filter-deps:
-	$(VENV_PATH)/bin/python ./filter-deps.py \
+filter_import_paths:
+	$(VENV_PATH)/bin/python \
+		./filter-import-paths.py \
 		$(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR) \
 		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR) \
 		$(POLYREPO_APIS_DEST_ROOT_DIR) \
@@ -297,3 +352,12 @@ filter-deps:
 		$(POLYREPO_STAGING_DEST_ROOT_DIR) \
 		$(AGGR_ADJ_FILE_MERGED_PATH) \
 		$(FILTERED_AGGR_ADJ_FILE_MERGED_PATH)
+
+construct_edge_file: construct_all_polyrepo_adj_files
+construct_edge_file: aggr_import_paths
+construct_edge_file: filter_import_paths
+
+make_all:
+	./make-all.sh $(POLYREPO_DEST_ROOT_DIR)
+
+

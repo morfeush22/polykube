@@ -154,3 +154,11 @@ ImportError: requires pygraphviz http://pygraphviz.github.io/
 >>> sgraph=x.edge_subgraph(graph, x.edges(graph, ["k8s.io/kubernetes/pkg/scheduler"]))
 >>> write_dot(sgraph, "./dot.graph")
 sfdp -x -Goverlap=scale -Tpng dot.graph > data.png
+
+import networkx as x
+g=x.read_edgelist("/home/morfeush22/Projects/masters/polyrepo/filtered_aggr_adj_file_merged.txt", create_using=x.DiGraph)
+rg=g.reverse()
+srg=x.edge_subgraph(rg, x.edges(rg, ["k8s.io/kubernetes/pkg/scheduler"]))
+from networkx.drawing.nx_agraph import write_dot
+write_dot(srg, "./dot.graph")
+sfdp -x -Goverlap=scale -Tpng dot.graph > data.png

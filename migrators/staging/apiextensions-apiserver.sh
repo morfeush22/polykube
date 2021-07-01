@@ -17,7 +17,7 @@ main() {
   waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/apimachinery" "${destination_path}"
   waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/apiserver" "${destination_path}"
   waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/client-go" "${destination_path}"
-  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/code-generator/go.mod" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/code-generator" "${destination_path}"
   waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/component-base" "${destination_path}"
 
   TARGETS="[${component_relative_path}]" \

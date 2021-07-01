@@ -13,12 +13,6 @@ main() {
   local component_relative_path="$2"
   local destination_path="$3"
 
-# uncomment in case of missing Go packages
-#  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/apiserver/pkg/admission/testing" "${destination_path}"
-#  waitress "${kubernetes_repo_root_dir}" "vendor/github.com/stretchr/testify/assert" "${destination_path}"
-#  waitress "${kubernetes_repo_root_dir}" "vendor/github.com/pmezard/go-difflib/difflib" "${destination_path}"
-#  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/component-base/featuregate/testing" "${destination_path}"
-#  waitress "${kubernetes_repo_root_dir}" "vendor/gopkg.in/yaml.v3" "${destination_path}"
   waitress "${kubernetes_repo_root_dir}" "plugin/pkg/auth/authorizer/rbac/bootstrappolicy/testdata" "${destination_path}"
 
   TEST_TARGETS="
