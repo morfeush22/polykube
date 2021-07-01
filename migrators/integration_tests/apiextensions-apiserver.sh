@@ -16,6 +16,7 @@ main() {
   # this is hacky, but I don't have a better idea right now
   # leaving this here will allow to enhance it later
   waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/apiextensions-apiserver" "${destination_path}"
+
   waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/apiextensions-apiserver/pkg/cmd/server/testing/testdata" "${destination_path}"
 
   waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/api/go.mod" "${destination_path}"

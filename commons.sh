@@ -77,7 +77,11 @@ twin() {
     mkdir -p "${dest_dir}"
   fi
 
-  ln -s "${src_abs_path}" "${dst_abs_path}"
+  if [[ ! -L ${dst_abs_path} ]]; then
+    ln -s "${src_abs_path}" "${dst_abs_path}"
+  else
+    WARN "symbolic link ${dst_abs_path} already exist"
+  fi
 }
 
 waitress() {

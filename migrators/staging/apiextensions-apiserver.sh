@@ -13,12 +13,23 @@ main() {
   local component_relative_path="$2"
   local destination_path="$3"
 
-  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/api" "${destination_path}"
-  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/apimachinery" "${destination_path}"
-  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/apiserver" "${destination_path}"
-  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/client-go" "${destination_path}"
-  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/code-generator" "${destination_path}"
-  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/component-base" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/api/go.mod" "${destination_path}"
+  twin "${destination_path}" "vendor/k8s.io/api" "staging/src/k8s.io/api"
+
+  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/apimachinery/go.mod" "${destination_path}"
+  twin "${destination_path}" "vendor/k8s.io/apimachinery" "staging/src/k8s.io/apimachinery"
+
+  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/apiserver/go.mod" "${destination_path}"
+  twin "${destination_path}" "vendor/k8s.io/apiserver" "staging/src/k8s.io/apiserver"
+
+  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/client-go/go.mod" "${destination_path}"
+  twin "${destination_path}" "vendor/k8s.io/client-go" "staging/src/k8s.io/client-go"
+
+  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/code-generator/go.mod" "${destination_path}"
+  twin "${destination_path}" "vendor/k8s.io/code-generator" "staging/src/k8s.io/code-generator"
+
+  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/component-base/go.mod" "${destination_path}"
+  twin "${destination_path}" "vendor/k8s.io/component-base" "staging/src/k8s.io/component-base"
 
   TARGETS="[${component_relative_path}]" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
