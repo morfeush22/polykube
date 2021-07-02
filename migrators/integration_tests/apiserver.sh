@@ -14,11 +14,11 @@ main() {
   local destination_path="$3"
 
   waitress "${kubernetes_repo_root_dir}" "cmd/kube-apiserver/app/testing/testdata" "${destination_path}"
-  waitress "${kubernetes_repo_root_dir}" "staging/src/k8s.io/apiextensions-apiserver/pkg/cmd/server/testing/testdata" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/apiextensions-apiserver/pkg/cmd/server/testing/testdata" "${destination_path}"
 
   TEST_TARGETS="
 [
-  \"${component_relative_path}\"
+  ${component_relative_path}
 ]
 "
 

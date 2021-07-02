@@ -162,3 +162,6 @@ srg=x.edge_subgraph(rg, x.edges(rg, ["k8s.io/kubernetes/pkg/scheduler"]))
 from networkx.drawing.nx_agraph import write_dot
 write_dot(srg, "./dot.graph")
 sfdp -x -Goverlap=scale -Tpng dot.graph > data.png
+
+export PATH="/home/morfeush22/Projects/kubernetes/third_party/etcd:${PATH}"
+etcd --advertise-client-urls http://127.0.0.1:2379 --data-dir /tmp/tmp.Gevfp9wZmC --listen-client-urls http://127.0.0.1:2379 --log-level=debug > "/dev/null" 2>/dev/null

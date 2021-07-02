@@ -33,7 +33,7 @@ main() {
 
   TEST_TARGETS="
 [
-  \"${component_relative_path}\"
+  ${component_relative_path}
 ]
 "
 

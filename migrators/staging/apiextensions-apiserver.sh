@@ -31,7 +31,7 @@ main() {
   waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/component-base" "${destination_path}"
   twin "${destination_path}" "vendor/k8s.io/component-base" "staging/src/k8s.io/component-base"
 
-  TARGETS="[${component_relative_path}]" \
+  TARGETS="[${component_relative_path}/pkg]" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
 
   cd "${destination_path}/${component_relative_path}" && go mod vendor

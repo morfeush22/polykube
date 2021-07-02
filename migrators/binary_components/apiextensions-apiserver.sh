@@ -33,7 +33,7 @@ main() {
 
   TEST_TARGETS="
 [
-  \"${component_relative_path}/pkg\"
+  ${component_relative_path}/pkg
 ]
 "
 
