@@ -11,7 +11,7 @@ main() {
   local component_relative_path="$2"
   local polyrepo_dest_root_dir="$3"
 
-  whisky "${kubernetes_repo_root_dir}" "${component_relative_path}" "${polyrepo_dest_root_dir}"
+  whisky_on_rocks "${kubernetes_repo_root_dir}" "${component_relative_path}" "${polyrepo_dest_root_dir}"
 }
 
 main "$@"

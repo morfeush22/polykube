@@ -201,37 +201,49 @@ _create_staging_subdir_%:
 	mkdir -p $(POLYREPO_STAGING_DEST_ROOT_DIR)/$(*)
 
 _migrate_binary_component_common_%:
-	migrators/bar.sh \
+	migrators/whisky-on-ice.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		$($(*)_RELATIVE_SUBPATH) \
 		$(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*)
 
+_migrate_binary_component_common_apiextensions-apiserver:
+	migrators/whisky-on-rocks.sh \
+		$(KUBERNETES_REPO_ROOT_DIR) \
+		$(apiextensions-apiserver_RELATIVE_SUBPATH) \
+		$(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/apiextensions-apiserver
+
+_migrate_binary_component_common_kube-aggregator:
+	migrators/whisky-on-rocks.sh \
+		$(KUBERNETES_REPO_ROOT_DIR) \
+		$(kube-aggregator_RELATIVE_SUBPATH) \
+		$(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/kube-aggregator
+
 _migrate_integration_test_common_%:
-	migrators/bar.sh \
+	migrators/whisky-on-ice.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		test/integration/$(*) \
 		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*)
 
 _migrate_integration_test_common_apiextensions-apiserver:
-	migrators/bar.sh \
+	migrators/whisky-on-rocks.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		$(apiextensions-apiserver_RELATIVE_SUBPATH)/test/integration \
 		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/apiextensions-apiserver
 
 _migrate_api_common_%:
-	migrators/bar.sh \
+	migrators/whisky-on-ice.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		pkg/$(*) \
 		$(POLYREPO_APIS_DEST_ROOT_DIR)/$(*)
 
 _migrate_plugin_common_%:
-	migrators/bar.sh \
+	migrators/whisky-on-ice.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		plugin/pkg/$(*) \
 		$(POLYREPO_PLUGINS_DEST_ROOT_DIR)/$(*)
 
 _migrate_staging_common_%:
-	migrators/bar.sh \
+	migrators/whisky-on-rocks.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		staging/src/k8s.io/$(*) \
 		$(POLYREPO_STAGING_DEST_ROOT_DIR)/$(*)

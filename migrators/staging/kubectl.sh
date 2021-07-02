@@ -13,35 +13,37 @@ main() {
   local component_relative_path="$2"
   local destination_path="$3"
 
-  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/api/go.mod" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/api" "${destination_path}"
   twin "${destination_path}" "vendor/k8s.io/api" "staging/src/k8s.io/api"
 
-  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/apimachinery/go.mod" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/apimachinery" "${destination_path}"
   twin "${destination_path}" "vendor/k8s.io/apimachinery" "staging/src/k8s.io/apimachinery"
 
-  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/apiserver/go.mod" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/apiserver" "${destination_path}"
   twin "${destination_path}" "vendor/k8s.io/apiserver" "staging/src/k8s.io/apiserver"
 
-  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/client-go/go.mod" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/client-go" "${destination_path}"
   twin "${destination_path}" "vendor/k8s.io/client-go" "staging/src/k8s.io/client-go"
 
-  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/code-generator/go.mod" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/code-generator" "${destination_path}"
   twin "${destination_path}" "vendor/k8s.io/code-generator" "staging/src/k8s.io/code-generator"
 
-  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/component-base/go.mod" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/component-base" "${destination_path}"
   twin "${destination_path}" "vendor/k8s.io/component-base" "staging/src/k8s.io/component-base"
 
-  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/cli-runtime/go.mod" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/cli-runtime" "${destination_path}"
   twin "${destination_path}" "vendor/k8s.io/cli-runtime" "staging/src/k8s.io/cli-runtime"
 
-  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/component-helpers/go.mod" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/component-helpers" "${destination_path}"
   twin "${destination_path}" "vendor/k8s.io/component-helpers" "staging/src/k8s.io/component-helpers"
 
-  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/metrics/go.mod" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/metrics" "${destination_path}"
   twin "${destination_path}" "vendor/k8s.io/metrics" "staging/src/k8s.io/metrics"
 
   TARGETS="[${component_relative_path}]" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
+
+  cd "${destination_path}/${component_relative_path}" && go mod vendor
 }
 
 main "$@"

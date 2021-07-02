@@ -15,6 +15,8 @@ main() {
 
   TARGETS="[${component_relative_path}]" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
+
+  cd "${destination_path}/${component_relative_path}" && go mod vendor
 }
 
 main "$@"
