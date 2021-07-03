@@ -37,11 +37,7 @@ main() {
   waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/component-base" "${destination_path}"
   twin "${destination_path}" "vendor/k8s.io/component-base" "staging/src/k8s.io/component-base"
 
-  TEST_TARGETS="
-[
-  ${component_relative_path}
-]
-"
+  TEST_TARGETS="[${component_relative_path}]"
 
   TEST_TARGETS="${TEST_TARGETS}" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"

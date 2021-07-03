@@ -15,11 +15,7 @@ main() {
 
   waitress "${kubernetes_repo_root_dir}" "plugin/pkg/auth/authorizer/rbac/bootstrappolicy/testdata" "${destination_path}"
 
-  TEST_TARGETS="
-[
-  ${component_relative_path}
-]
-"
+  TEST_TARGETS="[${component_relative_path}]"
 
   TEST_TARGETS="${TEST_TARGETS}" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"

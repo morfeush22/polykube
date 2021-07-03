@@ -13,11 +13,7 @@ main() {
   local component_relative_path="$2"
   local destination_path="$3"
 
-  TEST_TARGETS="
-[
-  ${component_relative_path}
-]
-"
+  TEST_TARGETS="[${component_relative_path}]"
 
   TEST_TARGETS="${TEST_TARGETS}" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"

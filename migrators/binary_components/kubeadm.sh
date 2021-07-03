@@ -13,13 +13,21 @@ main() {
   local component_relative_path="$2"
   local destination_path="$3"
 
-  TEST_TARGETS='
-[
-  "."
-]
+  TEST_TARGETS="[${component_relative_path}]"
+
+  ENVS='
+  KUBEADM_PATH: $(PWD)/kubeadm
 '
 
-  TARGET="${component_relative_path}" TEST_TARGETS="${TEST_TARGETS}" \
+  BUILD_FLAGS="
+  [
+    -X 'k8s.io/component-base/version.gitMajor=0340',
+    -X 'k8s.io/component-base/version.gitMinor=8347',
+    -X 'k8s.io/component-base/version.gitTreeState=clean'
+  ]
+"
+
+  ENVS="${ENVS}" BUILD_FLAGS="${BUILD_FLAGS}" TARGET="${component_relative_path}" TEST_TARGETS="${TEST_TARGETS}" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
 }
 
