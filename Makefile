@@ -352,11 +352,11 @@ construct_all_polyrepo_adj_files: construct_staging_polyrepo_adj_files
 
 aggr_import_paths:
 	find $(POLYREPO_DEST_ROOT_DIR) -maxdepth 3 -name "$(ADJ_FILE_NAME)" | xargs cat | sort > $(ADJ_FILE_MERGED_PATH)
-	$(VENV_PATH)/bin/python ./aggr-import-paths.py $(ADJ_FILE_MERGED_PATH) $(AGGR_ADJ_FILE_MERGED_PATH)
+	$(VENV_PATH)/bin/python ./aggr_import_paths.py $(ADJ_FILE_MERGED_PATH) $(AGGR_ADJ_FILE_MERGED_PATH)
 
 filter_import_paths:
 	$(VENV_PATH)/bin/python \
-		./filter-import-paths.py \
+		./filter_import_paths.py \
 		$(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR) \
 		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR) \
 		$(POLYREPO_APIS_DEST_ROOT_DIR) \
@@ -372,4 +372,20 @@ construct_edge_file: filter_import_paths
 make_all:
 	./make-all.sh $(POLYREPO_DEST_ROOT_DIR)
 
+GIT_SERVER_REPOS_PREFIX  := /repo
+GOCD_YAMLS_DEST_ROOT_DIR := $(POLYREPO_DEST_ROOT_DIR)/gocd_yamls
 
+create_gocd_yamls_subdir:
+	mkdir -p $(GOCD_YAMLS_DEST_ROOT_DIR)
+
+construct_polyrepo_gocd_yaml_files: create_gocd_yamls_subdir
+	$(VENV_PATH)/bin/python \
+		./gen_gocs_yamls.py \
+		$(BINARY_COMPONENTS_RELATIVE_DIR) \
+		$(INTEGRATION_TESTS_RELATIVE_DIR) \
+		$(APIS_RELATIVE_DIR) \
+		$(PLUGINS_RELATIVE_DIR) \
+		$(STAGING_RELATIVE_DIR) \
+		$(FILTERED_AGGR_ADJ_FILE_MERGED_PATH) \
+		$(GIT_SERVER_REPOS_PREFIX) \
+		$(GOCD_YAMLS_DEST_ROOT_DIR)

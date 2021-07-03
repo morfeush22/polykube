@@ -3,3 +3,4 @@ networkx==2.5.1
 pydot==1.4.2
 pygraphviz==1.7
 pyparsing==2.4.7
+PyYAML==5.4.1
