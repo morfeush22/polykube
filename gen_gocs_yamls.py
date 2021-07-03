@@ -86,7 +86,8 @@ def generate_gocd_yaml(pipelines):
     }
 
 
-def generate_binary_component_yaml_file(node, triggers, group, node_git_server_repo_path, binary_artifact_name):
+def generate_binary_component_yaml_file(node, node_triggers_list, group, node_git_server_repo_path,
+                                        binary_artifact_name):
     return generate_gocd_yaml(
         pipelines={
             node: generate_gocd_yaml_pipeline(
@@ -99,7 +100,7 @@ def generate_binary_component_yaml_file(node, triggers, group, node_git_server_r
                         trigger: generate_gocd_yaml_pipeline_material(
                             pipeline=trigger,
                             stage=_all
-                        ) for trigger in triggers
+                        ) for trigger in node_triggers_list
                     },
                 },
                 stages=[
@@ -108,7 +109,7 @@ def generate_binary_component_yaml_file(node, triggers, group, node_git_server_r
                             jobs=generate_gocd_yaml_job(
                                 artifacts=[
                                     {
-                                        _all: generate_gocd_yaml_artifact(
+                                        binary_artifact_name: generate_gocd_yaml_artifact(
                                             artifact_name=binary_artifact_name,
                                         ),
                                     }
@@ -122,7 +123,7 @@ def generate_binary_component_yaml_file(node, triggers, group, node_git_server_r
     )
 
 
-def generate_integration_test_yaml_file(node, triggers, group, node_git_server_repo_path):
+def generate_integration_test_yaml_file(node, node_triggers_list, group, node_git_server_repo_path):
     return generate_gocd_yaml(
         pipelines={
             node: generate_gocd_yaml_pipeline(
@@ -135,7 +136,7 @@ def generate_integration_test_yaml_file(node, triggers, group, node_git_server_r
                         trigger: generate_gocd_yaml_pipeline_material(
                             pipeline=trigger,
                             stage=_all
-                        ) for trigger in triggers
+                        ) for trigger in node_triggers_list
                     },
                 },
                 stages=[
@@ -152,7 +153,7 @@ def generate_integration_test_yaml_file(node, triggers, group, node_git_server_r
     )
 
 
-def generate_api_yaml_file(node, triggers, group, node_git_server_repo_path):
+def generate_api_yaml_file(node, node_triggers_list, group, node_git_server_repo_path):
     return generate_gocd_yaml(
         pipelines={
             node: generate_gocd_yaml_pipeline(
@@ -165,7 +166,7 @@ def generate_api_yaml_file(node, triggers, group, node_git_server_repo_path):
                         trigger: generate_gocd_yaml_pipeline_material(
                             pipeline=trigger,
                             stage=_all
-                        ) for trigger in triggers
+                        ) for trigger in node_triggers_list
                     },
                 },
                 stages=[
@@ -182,7 +183,7 @@ def generate_api_yaml_file(node, triggers, group, node_git_server_repo_path):
     )
 
 
-def generate_plugin_yaml_file(node, triggers, group, node_git_server_repo_path):
+def generate_plugin_yaml_file(node, node_triggers_list, group, node_git_server_repo_path):
     return generate_gocd_yaml(
         pipelines={
             node: generate_gocd_yaml_pipeline(
@@ -195,7 +196,7 @@ def generate_plugin_yaml_file(node, triggers, group, node_git_server_repo_path):
                         trigger: generate_gocd_yaml_pipeline_material(
                             pipeline=trigger,
                             stage=_all
-                        ) for trigger in triggers
+                        ) for trigger in node_triggers_list
                     },
                 },
                 stages=[
@@ -212,7 +213,7 @@ def generate_plugin_yaml_file(node, triggers, group, node_git_server_repo_path):
     )
 
 
-def generate_staging_yaml_file(node, triggers, group, node_git_server_repo_path):
+def generate_staging_yaml_file(node, node_triggers_list, group, node_git_server_repo_path):
     return generate_gocd_yaml(
         pipelines={
             node: generate_gocd_yaml_pipeline(
@@ -225,7 +226,7 @@ def generate_staging_yaml_file(node, triggers, group, node_git_server_repo_path)
                         trigger: generate_gocd_yaml_pipeline_material(
                             pipeline=trigger,
                             stage=_all
-                        ) for trigger in triggers
+                        ) for trigger in node_triggers_list
                     },
                 },
                 stages=[
@@ -251,12 +252,12 @@ def construct_node_gocd_file_name(node):
 
 
 def generate_gocd_yaml_file(node, node_triggers, node_type, node_git_server_repo_path, gocd_yamls_dest_root_dir):
-    node_yaml_dest_path = f"{gocd_yamls_dest_root_dir}/{construct_node_gocd_file_name(node)}.yaml"
+    node_gocd_yaml_dest_path = f"{gocd_yamls_dest_root_dir}/{construct_node_gocd_file_name(node)}.yaml"
 
-    triggers = []
+    node_triggers_list = []
 
     for node_trigger in node_triggers:
-        triggers.append(node_trigger)
+        node_triggers_list.append(node_trigger)
 
     group = f"POLYREPO_{node_type}"
 
@@ -264,19 +265,19 @@ def generate_gocd_yaml_file(node, node_triggers, node_type, node_git_server_repo
 
     if node_type == fip.BINARY_COMPONENT:
         binary_artifact_name = get_binary_artifact_name_from_node_name(node)
-        config = generate_binary_component_yaml_file(node, triggers, group, node_git_server_repo_path,
+        config = generate_binary_component_yaml_file(node, node_triggers_list, group, node_git_server_repo_path,
                                                      binary_artifact_name)
     elif node_type == fip.INTEGRATION_TEST:
-        config = generate_integration_test_yaml_file(node, triggers, group, node_git_server_repo_path)
+        config = generate_integration_test_yaml_file(node, node_triggers_list, group, node_git_server_repo_path)
     elif node_type == fip.API:
-        config = generate_api_yaml_file(node, triggers, group, node_git_server_repo_path)
+        config = generate_api_yaml_file(node, node_triggers_list, group, node_git_server_repo_path)
     elif node_type == fip.PLUGIN:
-        config = generate_plugin_yaml_file(node, triggers, group, node_git_server_repo_path)
+        config = generate_plugin_yaml_file(node, node_triggers_list, group, node_git_server_repo_path)
     elif node_type == fip.STAGING:
-        config = generate_staging_yaml_file(node, triggers, group, node_git_server_repo_path)
+        config = generate_staging_yaml_file(node, node_triggers_list, group, node_git_server_repo_path)
 
     if config is not None:
-        with open(node_yaml_dest_path, 'w') as gocd_yaml_file:
+        with open(node_gocd_yaml_dest_path, 'w') as gocd_yaml_file:
             yaml.dump(config, gocd_yaml_file)
     else:
         logging.warning(f"could not determine node type and config for {node}")
