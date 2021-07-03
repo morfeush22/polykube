@@ -165,3 +165,9 @@ sfdp -x -Goverlap=scale -Tpng dot.graph > data.png
 
 export PATH="/home/morfeush22/Projects/kubernetes/third_party/etcd:${PATH}"
 etcd --advertise-client-urls http://127.0.0.1:2379 --data-dir /tmp/tmp.Gevfp9wZmC --listen-client-urls http://127.0.0.1:2379 --log-level=debug > "/dev/null" 2>/dev/null
+
+go test -c ./test/e2e_kubeadm
+(alpha)
+./e2e_kubeadm.test --context kind-kind --num-nodes 2 --ginkgo.skip="\[copy-certs\]"
+kind build node-image
+./e2e --context kind-kind --num-nodes 2 --ginkgo.focus="\[Conformance\]"
