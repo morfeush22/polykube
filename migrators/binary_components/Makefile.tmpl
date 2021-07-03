@@ -1,27 +1,25 @@
-{{- range $key, $value := (getenv "ENVS" | yaml) -}}
-export {{ $key }} := {{ $value }}
-{{ end }}
-
 {{- $ldflags := join (getenv "BUILD_FLAGS" "[]" | yamlArray) " " -}}
-
 {{- $test_targets_escaped := dict -}}
 
 {{- range $test_target := (getenv "TEST_TARGETS" "[]" | yamlArray) -}}
-
 {{- $test_targets_escaped = merge $test_targets_escaped (dict (printf "test_%s" (strings.ReplaceAll "/" "_" $test_target)) $test_target) -}}
-
 {{- end -}}
 
-{{- $target := (getenv "TARGET") }}
-{{- $target_escaped := strings.ReplaceAll "/" "_" $target }}
-{{- $bin := filepath.Base $target }}
+{{- $target := (getenv "TARGET") -}}
+{{- $target_escaped := strings.ReplaceAll "/" "_" $target -}}
+{{- $bin := filepath.Base $target -}}
+
 all: {{ $target_escaped }} {{ join (keys $test_targets_escaped) " " }}
-
 {{ $target_escaped }}:
-	cd {{ $target }} && go build {{ if $ldflags }}-ldflags="{{ $ldflags }}" .{{ else }}.{{ end }}
-	cp {{ $target }}/{{ $bin }} .
+	cd {{ $target }} && go build \
+		{{ if $ldflags }}-ldflags="{{ $ldflags }}"{{ end }} \
+		.
 
-{{ range $key, $value := $test_targets_escaped -}}
+	cp {{ $target }}/{{ $bin }} .
+{{ range $key, $value := $test_targets_escaped }}
 {{ $key }}:
 	cd {{ $value }} && go test ./...
+{{ end }}
+{{- range $key, $value := (getenv "ENVS" | yaml) }}
+export {{ $key }} := {{ $value }}
 {{ end }}

@@ -1,8 +1,6 @@
 {{- $targets := (getenv "TARGETS" | yamlArray) -}}
 all: {{ join $targets " " | strings.ReplaceAll "/" "_" }}
-
 {{ range $_, $target := $targets }}
-{{- strings.ReplaceAll "/" "_" $target -}}:
+{{ strings.ReplaceAll "/" "_" $target }}:
 	cd {{ $target }} && go test ./...
-
-{{ end -}}
+{{ end }}

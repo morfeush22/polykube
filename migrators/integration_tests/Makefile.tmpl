@@ -6,9 +6,14 @@
 
 {{- end -}}
 
-all: {{ join (keys $test_targets_escaped) " " }}
+{{- $parallelism := getenv "PARALLELISM" "" -}}
+{{- $timeout := getenv "TIMEOUT" "" -}}
 
-{{ range $key, $value := $test_targets_escaped -}}
+all: {{ join (keys $test_targets_escaped) " " }}
+{{ range $key, $value := $test_targets_escaped }}
 {{ $key }}:
-	cd {{ $value }} && go test ./...
+	cd {{ $value }} && go test \
+		{{ if ne $parallelism "" }}-parallel {{ $parallelism }}{{ end }} \
+		{{ if ne $timeout "" }}-timeout {{ $timeout }}{{ end }} \
+		./...
 {{ end }}
