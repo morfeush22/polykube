@@ -172,4 +172,11 @@ export KUBECONFIG="${HOME}/.kube/kind-test-config"
 ./e2e_kubeadm.test --context kind-kind --num-nodes 2 --ginkgo.skip="\[copy-certs\]"
 kind build node-image
 ./e2e.test --context kind-kind --num-nodes 2 --ginkgo.focus="\[Conformance\]"
---kubectl-path
+--kubectl-path flag in e2e.test
+
+fuser -k 2379/tcp
+disown/nohup
+
+kindest/base                             v20210521-82de8f15   8669cdccea12   6 weeks ago      298MB
+k8s.gcr.io/build-image/go-runner         buster-v2.2.2        cbdac00ef190   7 months ago     3.52MB
+k8s.gcr.io/build-image/debian-iptables   buster-v1.3.0        084112816747   9 months ago     78.9MB

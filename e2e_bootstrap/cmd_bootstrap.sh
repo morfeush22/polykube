@@ -10,11 +10,14 @@ main() {
   local kubernetes_repo_root_dir="$1"
   local polyrepo_dest_root_dir="$2"
 
-  mkdir -p "${polyrepo_dest_root_dir}"/_output/local/bin/linux/amd64
+  local output_dest="${polyrepo_dest_root_dir}"/_output/local/bin/linux/amd64
 
-  cp "${kubernetes_repo_root_dir}"/_output/bin/kubectl "${polyrepo_dest_root_dir}"/_output/local/bin/linux/amd64/
-  cp "${kubernetes_repo_root_dir}"/_output/bin/kube-apiserver "${polyrepo_dest_root_dir}"/_output/local/bin/linux/amd64/
-  cp "${kubernetes_repo_root_dir}"/_output/bin/kube-controller-manager "${polyrepo_dest_root_dir}"/_output/local/bin/linux/amd64/
+  mkdir -p "${output_dest}"
+
+  # needed by test
+  cp "${kubernetes_repo_root_dir}"/_output/bin/kubectl "${output_dest}"
+  cp "${kubernetes_repo_root_dir}"/_output/bin/kube-apiserver "${output_dest}"
+  cp "${kubernetes_repo_root_dir}"/_output/bin/kube-controller-manager "${output_dest}"
 }
 
 main "$@"
