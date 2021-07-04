@@ -130,9 +130,8 @@ KUBERNETES_STAGING := \
 	mount-utils
 
 KUBERNETES_E2E_TESTS := \
-	cmd \
-	kubeadm \
-	conformance
+	cluster \
+	cmd
 
 KUBERNETES_BINARY_COMPONENTS_SUBDIRS_TARGETS := $(addprefix _create_binary_component_subdir_,$(KUBERNETES_BINARY_COMPONENTS))
 KUBERNETES_BINARY_COMPONENTS_MIGRATE_TARGETS := $(addprefix _migrate_binary_component_to_polyrepo_,$(KUBERNETES_BINARY_COMPONENTS))
@@ -308,17 +307,11 @@ _migrate_e2e_test_to_polyrepo_cmd:
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		$(POLYREPO_E2E_TESTS_DEST_ROOT_DIR)/cmd
 
-_migrate_e2e_test_to_polyrepo_kubeadm: _create_e2e_test_subdir_kubeadm
-_migrate_e2e_test_to_polyrepo_kubeadm:
-	migrators/e2e_tests/kubeadm.sh \
+_migrate_e2e_test_to_polyrepo_cluster: _create_e2e_test_subdir_cluster
+_migrate_e2e_test_to_polyrepo_cluster:
+	migrators/e2e_tests/cluster.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
-		$(POLYREPO_E2E_TESTS_DEST_ROOT_DIR)/cmd
-
-_migrate_e2e_test_to_polyrepo_conformance: _create_e2e_test_subdir_conformance
-_migrate_e2e_test_to_polyrepo_conformance:
-	migrators/e2e_tests/conformance.sh \
-		$(KUBERNETES_REPO_ROOT_DIR) \
-		$(POLYREPO_E2E_TESTS_DEST_ROOT_DIR)/cmd
+		$(POLYREPO_E2E_TESTS_DEST_ROOT_DIR)/cluster
 
 KUBERNETES_BINARY_COMPONENTS_POLYREPO_ADJ_FILE_TARGETS := $(addprefix _construct_binary_component_polyrepo_adj_file_,$(KUBERNETES_BINARY_COMPONENTS))
 KUBERNETES_INTEGRATION_TESTS_POLYREPO_ADJ_FILE_TARGETS := $(addprefix _construct_integration_test_polyrepo_adj_file_,$(KUBERNETES_INTEGRATION_TESTS))
@@ -429,3 +422,8 @@ e2e_cmd_bootstrap:
 	e2e_bootstrap/cmd_bootstrap.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		$(POLYREPO_E2E_TESTS_DEST_ROOT_DIR)/cmd
+
+e2e_cluster_bootstrap:
+	e2e_bootstrap/cluster_bootstrap.sh \
+		$(KUBERNETES_REPO_ROOT_DIR) \
+		$(POLYREPO_E2E_TESTS_DEST_ROOT_DIR)/cluster

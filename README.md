@@ -168,6 +168,8 @@ etcd --advertise-client-urls http://127.0.0.1:2379 --data-dir /tmp/tmp.Gevfp9wZm
 
 go test -c ./test/e2e_kubeadm
 (alpha)
+export KUBECONFIG="${HOME}/.kube/kind-test-config"
 ./e2e_kubeadm.test --context kind-kind --num-nodes 2 --ginkgo.skip="\[copy-certs\]"
 kind build node-image
-./e2e --context kind-kind --num-nodes 2 --ginkgo.focus="\[Conformance\]"
+./e2e.test --context kind-kind --num-nodes 2 --ginkgo.focus="\[Conformance\]"
+--kubectl-path
