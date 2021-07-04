@@ -149,6 +149,9 @@ KUBERNETES_PLUGINS_MIGRATE_TARGETS := $(addprefix _migrate_plugin_to_polyrepo_,$
 KUBERNETES_STAGING_SUBDIRS_TARGETS := $(addprefix _create_staging_subdir_,$(KUBERNETES_STAGING))
 KUBERNETES_STAGING_MIGRATE_TARGETS := $(addprefix _migrate_staging_to_polyrepo_,$(KUBERNETES_STAGING))
 
+KUBERNETES_E2E_TESTS_SUBDIRS_TARGETS := $(addprefix _create_e2e_test_subdir_,$(KUBERNETES_E2E_TESTS))
+KUBERNETES_E2E_TESTS_MIGRATE_TARGETS := $(addprefix _migrate_e2e_test_to_polyrepo_,$(KUBERNETES_E2E_TESTS))
+
 SHELL := bash
 
 create_binary_components_subdirs: $(KUBERNETES_BINARY_COMPONENTS_SUBDIRS_TARGETS)
@@ -156,36 +159,42 @@ create_integration_tests_subdirs: $(KUBERNETES_INTEGRATION_TESTS_SUBDIRS_TARGETS
 create_apis_subdirs: $(KUBERNETES_APIS_SUBDIRS_TARGETS)
 create_plugins_subdirs: $(KUBERNETES_PLUGINS_SUBDIRS_TARGETS)
 create_staging_subdirs: $(KUBERNETES_STAGING_SUBDIRS_TARGETS)
+create_e2e_tests_subdirs: $(KUBERNETES_E2E_TESTS_SUBDIRS_TARGETS)
 
 create_all_subdirs: create_binary_components_subdirs
 create_all_subdirs: create_integration_tests_subdirs
 create_all_subdirs: create_apis_subdirs
 create_all_subdirs: create_plugins_subdirs
 create_all_subdirs: create_staging_subdirs
+create_all_subdirs: create_e2e_tests_subdirs
 
 migrate_binary_components_to_polyrepo: $(KUBERNETES_BINARY_COMPONENTS_MIGRATE_TARGETS)
 migrate_integration_tests_to_polyrepo: $(KUBERNETES_INTEGRATION_TESTS_MIGRATE_TARGETS)
 migrate_apis_to_polyrepo: $(KUBERNETES_APIS_MIGRATE_TARGETS)
 migrate_plugins_to_polyrepo: $(KUBERNETES_PLUGINS_MIGRATE_TARGETS)
 migrate_staging_to_polyrepo: $(KUBERNETES_STAGING_MIGRATE_TARGETS)
+migrate_e2e_tests_to_polyrepo: $(KUBERNETES_E2E_TESTS_MIGRATE_TARGETS)
 
 migrate_all_to_polyrepo: migrate_binary_components_to_polyrepo
 migrate_all_to_polyrepo: migrate_integration_tests_to_polyrepo
 migrate_all_to_polyrepo: migrate_apis_to_polyrepo
 migrate_all_to_polyrepo: migrate_plugins_to_polyrepo
 migrate_all_to_polyrepo: migrate_staging_to_polyrepo
+migrate_all_to_polyrepo: migrate_e2e_tests_to_polyrepo
 
 BINARY_COMPONENTS_RELATIVE_DIR := binary_components
 INTEGRATION_TESTS_RELATIVE_DIR := integration_tests
 APIS_RELATIVE_DIR              := apis
 PLUGINS_RELATIVE_DIR           := plugins
 STAGING_RELATIVE_DIR           := staging
+E2E_TESTS_RELATIVE_DIR         := e2e_tests
 
 POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR := $(POLYREPO_DEST_ROOT_DIR)/$(BINARY_COMPONENTS_RELATIVE_DIR)
 POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR := $(POLYREPO_DEST_ROOT_DIR)/$(INTEGRATION_TESTS_RELATIVE_DIR)
 POLYREPO_APIS_DEST_ROOT_DIR              := $(POLYREPO_DEST_ROOT_DIR)/$(APIS_RELATIVE_DIR)
 POLYREPO_PLUGINS_DEST_ROOT_DIR           := $(POLYREPO_DEST_ROOT_DIR)/$(PLUGINS_RELATIVE_DIR)
 POLYREPO_STAGING_DEST_ROOT_DIR           := $(POLYREPO_DEST_ROOT_DIR)/$(STAGING_RELATIVE_DIR)
+POLYREPO_E2E_TESTS_DEST_ROOT_DIR         := $(POLYREPO_DEST_ROOT_DIR)/$(E2E_TESTS_RELATIVE_DIR)
 
 clean:
 	rm -rf $(POLYREPO_DEST_ROOT_DIR)
@@ -204,6 +213,9 @@ _create_plugin_subdir_%:
 
 _create_staging_subdir_%:
 	mkdir -p $(POLYREPO_STAGING_DEST_ROOT_DIR)/$(*)
+
+_create_e2e_test_subdir_%:
+	mkdir -p $(POLYREPO_E2E_TESTS_DEST_ROOT_DIR)/$(*)
 
 _migrate_binary_component_common_%:
 	migrators/whisky-on-ice.sh \
@@ -289,6 +301,24 @@ _migrate_staging_to_polyrepo_%: _create_staging_subdir_% _migrate_staging_common
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		staging/src/k8s.io/$(*) \
 		$(POLYREPO_STAGING_DEST_ROOT_DIR)/$(*)
+
+_migrate_e2e_test_to_polyrepo_cmd: _create_e2e_test_subdir_cmd
+_migrate_e2e_test_to_polyrepo_cmd:
+	migrators/e2e_tests/cmd.sh \
+		$(KUBERNETES_REPO_ROOT_DIR) \
+		$(POLYREPO_E2E_TESTS_DEST_ROOT_DIR)/cmd
+
+_migrate_e2e_test_to_polyrepo_kubeadm: _create_e2e_test_subdir_kubeadm
+_migrate_e2e_test_to_polyrepo_kubeadm:
+	migrators/e2e_tests/kubeadm.sh \
+		$(KUBERNETES_REPO_ROOT_DIR) \
+		$(POLYREPO_E2E_TESTS_DEST_ROOT_DIR)/cmd
+
+_migrate_e2e_test_to_polyrepo_conformance: _create_e2e_test_subdir_conformance
+_migrate_e2e_test_to_polyrepo_conformance:
+	migrators/e2e_tests/conformance.sh \
+		$(KUBERNETES_REPO_ROOT_DIR) \
+		$(POLYREPO_E2E_TESTS_DEST_ROOT_DIR)/cmd
 
 KUBERNETES_BINARY_COMPONENTS_POLYREPO_ADJ_FILE_TARGETS := $(addprefix _construct_binary_component_polyrepo_adj_file_,$(KUBERNETES_BINARY_COMPONENTS))
 KUBERNETES_INTEGRATION_TESTS_POLYREPO_ADJ_FILE_TARGETS := $(addprefix _construct_integration_test_polyrepo_adj_file_,$(KUBERNETES_INTEGRATION_TESTS))
@@ -394,3 +424,8 @@ construct_polyrepo_gocd_yaml_files: create_gocd_yamls_subdir
 		$(FILTERED_AGGR_ADJ_FILE_MERGED_PATH) \
 		$(GIT_SERVER_REPOS_PREFIX) \
 		$(GOCD_YAMLS_DEST_ROOT_DIR)
+
+e2e_cmd_bootstrap:
+	e2e_bootstrap/cmd_bootstrap.sh \
+		$(KUBERNETES_REPO_ROOT_DIR) \
+		$(POLYREPO_E2E_TESTS_DEST_ROOT_DIR)/cmd
