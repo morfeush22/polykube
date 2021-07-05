@@ -35,9 +35,10 @@ main() {
   # kind uses run.sh to build artifacts that we already have, hence we want to skip it using empty file
   echo '#!/usr/bin/env bash' >"${polyrepo_dest_root_dir}"/build/run.sh
 
-  local setup_script_path="${polyrepo_dest_root_dir}"/setup.sh
+  local bootstrap_script_file_name=bootstrap.sh
+  local bootstrap_script_file_dest_path="${polyrepo_dest_root_dir}/${bootstrap_script_file_name}"
 
-  cat <<'EOF' >"${setup_script_path}"
+  cat <<'EOF' >"${bootstrap_script_file_dest_path}"
 #!/usr/bin/env bash
 
 set -o errexit
@@ -49,16 +50,31 @@ source "${KUBE_ROOT}/build/common.sh"
 source "${KUBE_ROOT}/build/lib/release.sh"
 source "${KUBE_ROOT}"/env.sh
 
-export KUBECONFIG="${HOME}"/.kube/kind-test-config
-
 kube::release::build_server_images
 kind build node-image --kube-root "${KUBE_ROOT}"
 
 EOF
 
-  chmod 755 "${setup_script_path}"
+  chmod 755 "${bootstrap_script_file_dest_path}"
 
-  party "${MAKEFILE_TEMPLATE_PATH}" "${polyrepo_dest_root_dir}"
+  local kind_config_file_name="kind-config.yaml"
+  local kind_config_file_dest_path="${polyrepo_dest_root_dir}/${kind_config_file_name}"
+
+  cat <<'EOF' >"${kind_config_file_dest_path}"
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  ipFamily: ipv4
+nodes:
+- role: control-plane
+- role: worker
+- role: worker
+
+EOF
+
+  BOOTSTRAP_SCRIPT_RELATIVE_PATH="./${bootstrap_script_file_name}" \
+  KIND_CONFIG_RELATIVE_PATH="./${kind_config_file_name}" \
+    party "${MAKEFILE_TEMPLATE_PATH}" "${polyrepo_dest_root_dir}"
 }
 
 main "$@"

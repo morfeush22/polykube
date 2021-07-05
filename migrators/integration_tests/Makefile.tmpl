@@ -18,3 +18,23 @@ tests: {{ join (keys $test_targets_escaped) " " }}
 		{{ if ne $timeout "" }}-timeout {{ $timeout }}{{ end }} \
 		./...
 {{ end }}
+
+# etcd
+export MAKEFILE_ETCD_HOST := 127.0.0.1
+export MAKEFILE_ETCD_PORT := 2379
+
+setup:
+	$(eval export MAKEFILE_ETCD_DATA_DIR := $(shell mktemp -d))
+	$(eval export MAKEFILE_ETCD_LOG_DIR  := $(shell mktemp))
+
+	nohup etcd \
+		--advertise-client-urls http://$(MAKEFILE_ETCD_HOST):$(MAKEFILE_ETCD_PORT) \
+		--data-dir "$(MAKEFILE_ETCD_DATA_DIR)" \
+		--listen-client-urls http://$(MAKEFILE_ETCD_HOST):$(MAKEFILE_ETCD_PORT) \
+		--log-level=debug 2>"$(MAKEFILE_ETCD_LOG_DIR)" >/dev/null &
+
+	# hacky, wait for etcd to up
+	sleep 20
+
+teardown:
+	fuser -k 2379/tcp

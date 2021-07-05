@@ -164,7 +164,7 @@ def generate_binary_component_yaml_file(node_pipeline_name, node_pipeline_trigge
                     }
                 ],
                 environment_variables={
-                    "GO_MATERIAL_NAME": node_material_name
+                    "MATERIAL_NAME": node_material_name
                 }
             )
         }
@@ -198,7 +198,7 @@ def generate_integration_test_yaml_file(node_pipeline_name, node_pipeline_trigge
                     }
                 ],
                 environment_variables={
-                    "GO_MATERIAL_NAME": node_material_name
+                    "MATERIAL_NAME": node_material_name
                 }
 
             )
@@ -233,7 +233,7 @@ def generate_api_yaml_file(node_pipeline_name, node_pipeline_triggers_list, grou
                     }
                 ],
                 environment_variables={
-                    "GO_MATERIAL_NAME": node_material_name
+                    "MATERIAL_NAME": node_material_name
                 }
             )
         }
@@ -267,7 +267,7 @@ def generate_plugin_yaml_file(node_pipeline_name, node_pipeline_triggers_list, g
                     }
                 ],
                 environment_variables={
-                    "GO_MATERIAL_NAME": node_material_name
+                    "MATERIAL_NAME": node_material_name
                 }
             )
         }
@@ -301,7 +301,7 @@ def generate_staging_yaml_file(node_pipeline_name, node_pipeline_triggers_list, 
                     }
                 ],
                 environment_variables={
-                    "GO_MATERIAL_NAME": node_material_name
+                    "MATERIAL_NAME": node_material_name
                 }
             )
         }

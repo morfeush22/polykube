@@ -174,6 +174,9 @@ kind build node-image
 ./e2e.test --context kind-kind --num-nodes 2 --ginkgo.focus="\[Conformance\]"
 --kubectl-path flag in e2e.test
 
+kind create cluster --config kind-config.yaml --image kindest/node:latest -v4
++ kind delete (?)
+
 fuser -k 2379/tcp
 disown/nohup
 
