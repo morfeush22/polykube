@@ -1,15 +1,16 @@
 {{- $test_targets_escaped := dict -}}
 
 {{- range $test_target := (getenv "TEST_TARGETS" | yamlArray) -}}
-
 {{- $test_targets_escaped = merge $test_targets_escaped (dict (strings.ReplaceAll "/" "_" $test_target) $test_target) -}}
-
 {{- end -}}
 
 {{- $parallelism := getenv "PARALLELISM" "" -}}
 {{- $timeout := getenv "TIMEOUT" "" -}}
 
-all: {{ join (keys $test_targets_escaped) " " }}
+all: tests
+
+tests: {{ join (keys $test_targets_escaped) " " }}
+
 {{ range $key, $value := $test_targets_escaped }}
 {{ $key }}:
 	cd {{ $value }} && go test \
@@ -17,7 +18,3 @@ all: {{ join (keys $test_targets_escaped) " " }}
 		{{ if ne $timeout "" }}-timeout {{ $timeout }}{{ end }} \
 		./...
 {{ end }}
-
-setup:
-
-teardown:

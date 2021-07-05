@@ -3,6 +3,8 @@
 # shellcheck disable=SC1090
 source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/b-log.sh
 
+readonly HACK_CHECK_REV_PATH="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/hack/check-rev.sh
+
 calculate_package_absolute_path() {
   local kubernetes_repo_root_dir="$1"
   local package="$2"
@@ -253,4 +255,5 @@ party() {
   local destination_root_dir="$2"
 
   gomplate -f "${template_path}" -o "${destination_root_dir}"/Makefile
+  cp "${HACK_CHECK_REV_PATH}" "${destination_root_dir}"
 }

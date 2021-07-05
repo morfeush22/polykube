@@ -1,12 +1,12 @@
+# hack for scripts
+all quick-release-images:
+
 cluster:
 	go test -c ./test/e2e_kubeadm
 	go test -c ./test/e2e
 
 	./e2e_kubeadm.test --context kind-kind --num-nodes 2 --ginkgo.skip="\[copy-certs\]"
 	./e2e.test --kubectl-path ./kubectl --context kind-kind --num-nodes 2 --ginkgo.focus="\[Conformance\]"
-
-# hack for scripts
-all quick-release-images:
 
 setup:
 	./setup.sh

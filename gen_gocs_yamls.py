@@ -13,7 +13,7 @@ logging.basicConfig(level=LOGLEVEL)
 _all = "all"
 
 
-def generate_gocd_yaml_job(artifacts):
+def generate_gocd_yaml_common_job(artifacts):
     return {
         "timeout": 0,
         "tasks": [
@@ -21,7 +21,7 @@ def generate_gocd_yaml_job(artifacts):
                 "exec": {
                     "arguments": [
                         "-c",
-                        "make all"
+                        "./check-rev.sh || make all"
                     ],
                     "command": "/bin/sh",
                     "run_if": "passed"
@@ -30,6 +30,51 @@ def generate_gocd_yaml_job(artifacts):
         ],
         "artifacts": artifacts
     }
+
+
+def generate_binary_component_gocd_yaml_job(artifacts):
+    return {
+        "timeout": 0,
+        "tasks": [
+            {
+                "exec": {
+                    "arguments": [
+                        "-c",
+                        "make build"
+                    ],
+                    "command": "/bin/sh",
+                    "run_if": "passed"
+                }
+            },
+            {
+                "exec": {
+                    "arguments": [
+                        "-c",
+                        "./check-rev.sh || make tests"
+                    ],
+                    "command": "/bin/sh",
+                    "run_if": "passed"
+                }
+            }
+        ],
+        "artifacts": artifacts
+    }
+
+
+def generate_integration_test_gocd_yaml_job(artifacts):
+    return generate_gocd_yaml_common_job(artifacts)
+
+
+def generate_api_gocd_yaml_job(artifacts):
+    return generate_gocd_yaml_common_job(artifacts)
+
+
+def generate_plugin_gocd_yaml_job(artifacts):
+    return generate_gocd_yaml_common_job(artifacts)
+
+
+def generate_staging_gocd_yaml_job(artifacts):
+    return generate_gocd_yaml_common_job(artifacts)
 
 
 def generate_gocd_yaml_artifact(artifact_name):
@@ -68,7 +113,7 @@ def generate_gocd_yaml_pipeline_material(pipeline, stage):
     }
 
 
-def generate_gocd_yaml_pipeline(group, materials, stages):
+def generate_gocd_yaml_pipeline(group, materials, stages, environment_variables):
     return {
         "group": group,
         "label_template": "${COUNT}",
@@ -86,27 +131,27 @@ def generate_gocd_yaml(pipelines):
     }
 
 
-def generate_binary_component_yaml_file(node, node_triggers_list, group, node_git_server_repo_path,
-                                        binary_artifact_name):
+def generate_binary_component_yaml_file(node_pipeline_name, node_pipeline_triggers_list, group, node_material_name,
+                                        node_git_server_repo_path, binary_artifact_name):
     return generate_gocd_yaml(
         pipelines={
-            node: generate_gocd_yaml_pipeline(
+            node_pipeline_name: generate_gocd_yaml_pipeline(
                 group=group,
                 materials={
-                    node_git_server_repo_path: generate_gocd_yaml_git_material(
+                    node_material_name: generate_gocd_yaml_git_material(
                         git_server_repo_path=node_git_server_repo_path
                     ),
                     **{
                         trigger: generate_gocd_yaml_pipeline_material(
                             pipeline=trigger,
                             stage=_all
-                        ) for trigger in node_triggers_list
+                        ) for trigger in node_pipeline_triggers_list
                     },
                 },
                 stages=[
                     {
                         _all: generate_gocd_yaml_stage(
-                            jobs=generate_gocd_yaml_job(
+                            jobs=generate_binary_component_gocd_yaml_job(
                                 artifacts=[
                                     {
                                         binary_artifact_name: generate_gocd_yaml_artifact(
@@ -117,127 +162,147 @@ def generate_binary_component_yaml_file(node, node_triggers_list, group, node_gi
                             )
                         )
                     }
-                ]
+                ],
+                environment_variables={
+                    "GO_MATERIAL_NAME": node_material_name
+                }
             )
         }
     )
 
 
-def generate_integration_test_yaml_file(node, node_triggers_list, group, node_git_server_repo_path):
+def generate_integration_test_yaml_file(node_pipeline_name, node_pipeline_triggers_list, group, node_material_name,
+                                        node_git_server_repo_path):
     return generate_gocd_yaml(
         pipelines={
-            node: generate_gocd_yaml_pipeline(
+            node_pipeline_name: generate_gocd_yaml_pipeline(
                 group=group,
                 materials={
-                    node_git_server_repo_path: generate_gocd_yaml_git_material(
+                    node_material_name: generate_gocd_yaml_git_material(
                         git_server_repo_path=node_git_server_repo_path
                     ),
                     **{
                         trigger: generate_gocd_yaml_pipeline_material(
                             pipeline=trigger,
                             stage=_all
-                        ) for trigger in node_triggers_list
+                        ) for trigger in node_pipeline_triggers_list
                     },
                 },
                 stages=[
                     {
                         _all: generate_gocd_yaml_stage(
-                            jobs=generate_gocd_yaml_job(
+                            jobs=generate_integration_test_gocd_yaml_job(
                                 artifacts=[]
                             )
                         )
                     }
-                ]
+                ],
+                environment_variables={
+                    "GO_MATERIAL_NAME": node_material_name
+                }
+
             )
         }
     )
 
 
-def generate_api_yaml_file(node, node_triggers_list, group, node_git_server_repo_path):
+def generate_api_yaml_file(node_pipeline_name, node_pipeline_triggers_list, group, node_material_name,
+                           node_git_server_repo_path):
     return generate_gocd_yaml(
         pipelines={
-            node: generate_gocd_yaml_pipeline(
+            node_pipeline_name: generate_gocd_yaml_pipeline(
                 group=group,
                 materials={
-                    node_git_server_repo_path: generate_gocd_yaml_git_material(
+                    node_material_name: generate_gocd_yaml_git_material(
                         git_server_repo_path=node_git_server_repo_path
                     ),
                     **{
                         trigger: generate_gocd_yaml_pipeline_material(
                             pipeline=trigger,
                             stage=_all
-                        ) for trigger in node_triggers_list
+                        ) for trigger in node_pipeline_triggers_list
                     },
                 },
                 stages=[
                     {
                         _all: generate_gocd_yaml_stage(
-                            jobs=generate_gocd_yaml_job(
+                            jobs=generate_api_gocd_yaml_job(
                                 artifacts=[]
                             )
                         )
                     }
-                ]
+                ],
+                environment_variables={
+                    "GO_MATERIAL_NAME": node_material_name
+                }
             )
         }
     )
 
 
-def generate_plugin_yaml_file(node, node_triggers_list, group, node_git_server_repo_path):
+def generate_plugin_yaml_file(node_pipeline_name, node_pipeline_triggers_list, group, node_material_name,
+                              node_git_server_repo_path):
     return generate_gocd_yaml(
         pipelines={
-            node: generate_gocd_yaml_pipeline(
+            node_pipeline_name: generate_gocd_yaml_pipeline(
                 group=group,
                 materials={
-                    node_git_server_repo_path: generate_gocd_yaml_git_material(
+                    node_material_name: generate_gocd_yaml_git_material(
                         git_server_repo_path=node_git_server_repo_path
                     ),
                     **{
                         trigger: generate_gocd_yaml_pipeline_material(
                             pipeline=trigger,
                             stage=_all
-                        ) for trigger in node_triggers_list
+                        ) for trigger in node_pipeline_triggers_list
                     },
                 },
                 stages=[
                     {
                         _all: generate_gocd_yaml_stage(
-                            jobs=generate_gocd_yaml_job(
+                            jobs=generate_plugin_gocd_yaml_job(
                                 artifacts=[]
                             )
                         )
                     }
-                ]
+                ],
+                environment_variables={
+                    "GO_MATERIAL_NAME": node_material_name
+                }
             )
         }
     )
 
 
-def generate_staging_yaml_file(node, node_triggers_list, group, node_git_server_repo_path):
+def generate_staging_yaml_file(node_pipeline_name, node_pipeline_triggers_list, group, node_material_name,
+                               node_git_server_repo_path):
     return generate_gocd_yaml(
         pipelines={
-            node: generate_gocd_yaml_pipeline(
+            node_pipeline_name: generate_gocd_yaml_pipeline(
                 group=group,
                 materials={
-                    node_git_server_repo_path: generate_gocd_yaml_git_material(
+                    node_material_name: generate_gocd_yaml_git_material(
                         git_server_repo_path=node_git_server_repo_path
                     ),
                     **{
                         trigger: generate_gocd_yaml_pipeline_material(
                             pipeline=trigger,
                             stage=_all
-                        ) for trigger in node_triggers_list
+                        ) for trigger in node_pipeline_triggers_list
                     },
                 },
                 stages=[
                     {
                         _all: generate_gocd_yaml_stage(
-                            jobs=generate_gocd_yaml_job(
+                            jobs=generate_staging_gocd_yaml_job(
                                 artifacts=[]
                             )
                         )
                     }
-                ]
+                ],
+                environment_variables={
+                    "GO_MATERIAL_NAME": node_material_name
+                }
             )
         }
     )
@@ -247,17 +312,29 @@ def get_binary_artifact_name_from_node_name(node):
     return node.split("/")[-1]
 
 
-def construct_node_gocd_file_name(node):
-    return node.replace("/", "_")
+def escape_node_forbidden_chars(node):
+    return node.replace("/", "_").replace(".", "_").replace("-", "_")
+
+
+def construct_node_pipeline_name(node):
+    return f"{escape_node_forbidden_chars(node)}_pipeline"
+
+
+def construct_node_material_name(node):
+    return f"{escape_node_forbidden_chars(node)}_material"
 
 
 def generate_gocd_yaml_file(node, node_triggers, node_type, node_git_server_repo_path, gocd_yamls_dest_root_dir):
-    node_gocd_yaml_dest_path = f"{gocd_yamls_dest_root_dir}/{construct_node_gocd_file_name(node)}.yaml"
+    node_pipeline_name = construct_node_pipeline_name(node)
+    node_material_name = construct_node_material_name(node)
 
-    node_triggers_list = []
+    node_gocd_yaml_dest_path = f"{gocd_yamls_dest_root_dir}/{node_pipeline_name}.yaml"
+
+    node_pipeline_triggers_list = []
 
     for node_trigger in node_triggers:
-        node_triggers_list.append(node_trigger)
+        node_trigger_pipeline_name = construct_node_pipeline_name(node_trigger)
+        node_pipeline_triggers_list.append(node_trigger_pipeline_name)
 
     group = f"POLYREPO_{node_type}"
 
@@ -265,16 +342,22 @@ def generate_gocd_yaml_file(node, node_triggers, node_type, node_git_server_repo
 
     if node_type == fip.BINARY_COMPONENT:
         binary_artifact_name = get_binary_artifact_name_from_node_name(node)
-        config = generate_binary_component_yaml_file(node, node_triggers_list, group, node_git_server_repo_path,
-                                                     binary_artifact_name)
+        config = generate_binary_component_yaml_file(node_pipeline_name, node_pipeline_triggers_list, group,
+                                                     node_material_name,
+                                                     node_git_server_repo_path, binary_artifact_name)
     elif node_type == fip.INTEGRATION_TEST:
-        config = generate_integration_test_yaml_file(node, node_triggers_list, group, node_git_server_repo_path)
+        config = generate_integration_test_yaml_file(node_pipeline_name, node_pipeline_triggers_list, group,
+                                                     node_material_name,
+                                                     node_git_server_repo_path)
     elif node_type == fip.API:
-        config = generate_api_yaml_file(node, node_triggers_list, group, node_git_server_repo_path)
+        config = generate_api_yaml_file(node_pipeline_name, node_pipeline_triggers_list, group, node_material_name,
+                                        node_git_server_repo_path)
     elif node_type == fip.PLUGIN:
-        config = generate_plugin_yaml_file(node, node_triggers_list, group, node_git_server_repo_path)
+        config = generate_plugin_yaml_file(node_pipeline_name, node_pipeline_triggers_list, group, node_material_name,
+                                           node_git_server_repo_path)
     elif node_type == fip.STAGING:
-        config = generate_staging_yaml_file(node, node_triggers_list, group, node_git_server_repo_path)
+        config = generate_staging_yaml_file(node_pipeline_name, node_pipeline_triggers_list, group, node_material_name,
+                                            node_git_server_repo_path)
 
     if config is not None:
         with open(node_gocd_yaml_dest_path, 'w') as gocd_yaml_file:
@@ -288,10 +371,14 @@ def generate_gocd_yaml_files(filtered_aggr_adj_file_merged_path, node_type_to_re
     deps_graph = x.read_edgelist(filtered_aggr_adj_file_merged_path, create_using=x.DiGraph)
 
     # we need list of deps that should trigger that node
-    reversed_deps_graph = deps_graph.reverse()
+    target_deps_graph = deps_graph
 
-    for node in reversed_deps_graph.nodes():
-        node_triggers = x.neighbors(reversed_deps_graph, node)
+    if not x.is_directed_acyclic_graph(deps_graph):
+        logging.warning("graph is not DAG")
+        logging.warning(f"cycles: {x.find_cycle(deps_graph)}")
+
+    for node in target_deps_graph.nodes():
+        node_triggers = x.neighbors(target_deps_graph, node)
 
         node_type, node_subdir = fip.infer_type_and_subdir(node)
 
