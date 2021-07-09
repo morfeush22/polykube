@@ -106,10 +106,8 @@ KUBERNETES_PLUGINS := \
 	admission \
 	auth
 
-# TODO remove apiextensions-apiserver kube-aggregator
 KUBERNETES_STAGING := \
 	api \
-	apiextensions-apiserver \
 	apimachinery \
 	apiserver \
 	cli-runtime \
@@ -121,7 +119,6 @@ KUBERNETES_STAGING := \
 	controller-manager \
 	cri-api \
 	csi-translation-lib \
-	kube-aggregator \
 	kube-proxy \
 	kube-scheduler \
 	kubectl \

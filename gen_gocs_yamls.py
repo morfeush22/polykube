@@ -214,8 +214,6 @@ def generate_gocd_yaml_e2e_tests_files(e2e_cluster_test_node_triggers, e2e_cmd_t
         yaml.dump(e2e_cmd_test_config, gocd_yaml_file)
 
 
-# TODO no deps, create separate pipeline
-# k8s.io/kubernetes/cluster/gce/gci/mounter
 def generate_gocd_yaml_files(filtered_aggr_adj_file_merged_path, node_type_to_relative_dir, git_server_repos_prefix,
                              gocd_yamls_dest_root_dir):
     deps_graph = x.read_edgelist(filtered_aggr_adj_file_merged_path, create_using=x.DiGraph)
