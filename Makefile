@@ -106,6 +106,7 @@ KUBERNETES_PLUGINS := \
 	admission \
 	auth
 
+# TODO remove apiextensions-apiserver kube-aggregator
 KUBERNETES_STAGING := \
 	api \
 	apiextensions-apiserver \
@@ -414,6 +415,7 @@ construct_polyrepo_gocd_yaml_files: create_gocd_yamls_subdir
 		$(APIS_RELATIVE_DIR) \
 		$(PLUGINS_RELATIVE_DIR) \
 		$(STAGING_RELATIVE_DIR) \
+		$(E2E_TESTS_RELATIVE_DIR) \
 		$(FILTERED_AGGR_ADJ_FILE_MERGED_PATH) \
 		$(GIT_SERVER_REPOS_PREFIX) \
 		$(GOCD_YAMLS_DEST_ROOT_DIR)

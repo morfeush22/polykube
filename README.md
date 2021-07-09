@@ -183,3 +183,10 @@ disown/nohup
 kindest/base                             v20210521-82de8f15   8669cdccea12   6 weeks ago      298MB
 k8s.gcr.io/build-image/go-runner         buster-v2.2.2        cbdac00ef190   7 months ago     3.52MB
 k8s.gcr.io/build-image/debian-iptables   buster-v1.3.0        084112816747   9 months ago     78.9MB
+
+- fetch:
+     pipeline: pipe2
+     stage: build
+     job: test
+     source: test-bin/
+     destination: bin/

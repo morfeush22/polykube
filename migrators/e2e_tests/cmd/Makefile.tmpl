@@ -1,5 +1,8 @@
-# hack for scripts
+# hack for scripts, kubeadm tested in binary component
 all test:
+
+bootstrap:
+	{{ getenv "BOOTSTRAP_SCRIPT_RELATIVE_PATH" }}
 
 cmd:
 	./hack/make-rules/test-cmd.sh

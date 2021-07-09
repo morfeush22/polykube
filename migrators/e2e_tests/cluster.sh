@@ -50,8 +50,22 @@ source "${KUBE_ROOT}/build/common.sh"
 source "${KUBE_ROOT}/build/lib/release.sh"
 source "${KUBE_ROOT}"/env.sh
 
+DEST_DIR="_output/dockerized/bin/${GOOS}/${GOARCH}"
+
+mkdir -p "${DEST_DIR}"
+
+cp "${ARTIFACTS_DIR}/kubeadm" "./${DEST_DIR}/kubeadm"
+cp "${ARTIFACTS_DIR}/kubelet" "./${DEST_DIR}/kubelet"
+cp "${ARTIFACTS_DIR}/kubectl" "./${DEST_DIR}/kubectl"
+cp "${ARTIFACTS_DIR}/kube-apiserver" "./${DEST_DIR}/kube-apiserver"
+cp "${ARTIFACTS_DIR}/kube-controller-manager" "./${DEST_DIR}/kube-controller-manager"
+cp "${ARTIFACTS_DIR}/kube-proxy" "./${DEST_DIR}/kube-proxy"
+cp "${ARTIFACTS_DIR}/kube-scheduler" "./${DEST_DIR}/kube-scheduler"
+
 kube::release::build_server_images
 kind build node-image --kube-root "${KUBE_ROOT}"
+
+cp "./${DEST_DIR}/kubectl" ./kubectl
 
 EOF
 

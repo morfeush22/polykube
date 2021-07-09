@@ -11,20 +11,27 @@ INTEGRATION_TEST = "INTEGRATION_TEST"
 API = "API"
 PLUGIN = "PLUGIN"
 STAGING = "STAGING"
+E2E_TEST = "E2E_TEST"
 
 
 def infer_type_and_subdir(import_path):
     kubernetes_repo_import_path = "k8s.io/kubernetes"
 
     binary_components_import_path = f"{kubernetes_repo_import_path}/cmd"
+    kubernetes_mounter_import_path = f"{kubernetes_repo_import_path}/cluster/gce/gci/mounter"
     integration_tests_import_path = f"{kubernetes_repo_import_path}/test/integration"
     apis_import_path = f"{kubernetes_repo_import_path}/pkg"
     plugins_import_path = f"{kubernetes_repo_import_path}/plugin/pkg"
     staging_import_path = "k8s.io"
-    kubernetes_apiextensions_apiserver_test_integration_import_path = f"{staging_import_path}/apiextensions-apiserver/test/integration"
+    kubernetes_apiextensions_apiserver_import_path = f"{staging_import_path}/apiextensions-apiserver"
+    kubernetes_apiextensions_apiserver_test_integration_import_path = \
+        f"{kubernetes_apiextensions_apiserver_import_path}/test/integration"
+    kubernetes_kube_aggregator_import_path = f"{staging_import_path}/kube-aggregator"
 
     if import_path.startswith(binary_components_import_path):
         return BINARY_COMPONENT, import_path.removeprefix(f"{binary_components_import_path}/")
+    elif import_path.startswith(kubernetes_mounter_import_path):
+        return BINARY_COMPONENT, import_path.removeprefix(f"{kubernetes_mounter_import_path}/")
     elif import_path.startswith(integration_tests_import_path):
         return INTEGRATION_TEST, import_path.removeprefix(f"{integration_tests_import_path}/")
     elif import_path.startswith(apis_import_path):
@@ -33,6 +40,10 @@ def infer_type_and_subdir(import_path):
         return PLUGIN, import_path.removeprefix(f"{plugins_import_path}/")
     elif import_path.startswith(kubernetes_apiextensions_apiserver_test_integration_import_path):
         return INTEGRATION_TEST, "apiextensions-apiserver"
+    elif import_path.startswith(kubernetes_apiextensions_apiserver_import_path):
+        return BINARY_COMPONENT, "apiextensions-apiserver"
+    elif import_path.startswith(kubernetes_kube_aggregator_import_path):
+        return BINARY_COMPONENT, "kube-aggregator"
     elif import_path.startswith(staging_import_path):
         return STAGING, import_path.removeprefix(f"{staging_import_path}/")
     else:

@@ -31,7 +31,30 @@ main() {
   waitress "${kubernetes_repo_root_dir}" "test/e2e/testing-manifests/kubectl" "${polyrepo_dest_root_dir}"
   waitress "${kubernetes_repo_root_dir}" "test/e2e/testing-manifests/statefulset/cassandra" "${polyrepo_dest_root_dir}"
 
-  party "${MAKEFILE_TEMPLATE_PATH}" "${polyrepo_dest_root_dir}"
+  local bootstrap_script_file_name=bootstrap.sh
+  local bootstrap_script_file_dest_path="${polyrepo_dest_root_dir}/${bootstrap_script_file_name}"
+
+  cat <<'EOF' >"${bootstrap_script_file_dest_path}"
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+DEST_DIR="_output/dockerized/bin/${GOOS}/${GOARCH}"
+
+mkdir -p "${DEST_DIR}"
+
+cp "${ARTIFACTS_DIR}/kubectl" "./${DEST_DIR}/kubectl"
+cp "${ARTIFACTS_DIR}/kube-apiserver" "./${DEST_DIR}/kube-apiserver"
+cp "${ARTIFACTS_DIR}/kube-controller-manager" "./${DEST_DIR}/kube-controller-manager"
+
+EOF
+
+  chmod 755 "${bootstrap_script_file_dest_path}"
+
+  BOOTSTRAP_SCRIPT_RELATIVE_PATH="./${bootstrap_script_file_name}" \
+    party "${MAKEFILE_TEMPLATE_PATH}" "${polyrepo_dest_root_dir}"
 }
 
 main "$@"
