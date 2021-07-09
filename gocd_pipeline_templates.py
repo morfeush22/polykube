@@ -175,9 +175,11 @@ def generate_e2e_cmd_test_gocd_yaml_job(fetch_artifacts_list):
     }
 
 
-def generate_gocd_yaml_artifact(artifact_name):
+def generate_gocd_yaml_build_artifact(artifact_name):
     return {
-        "source": artifact_name
+        "build": {
+            "source": artifact_name
+        }
     }
 
 
@@ -215,7 +217,7 @@ def generate_gocd_yaml_pipeline(group, materials, stages, environment_variables)
     return {
         "group": group,
         "label_template": "${COUNT}",
-        "lock_behavior": None,
+        "lock_behavior": "none",
         "display_order": -1,
         "materials": materials,
         "stages": stages,
@@ -253,11 +255,9 @@ def generate_binary_component_yaml_file(node_pipeline_name, node_pipeline_trigge
                             jobs={
                                 _all: generate_binary_component_gocd_yaml_job(
                                     artifacts=[
-                                        {
-                                            binary_artifact_name: generate_gocd_yaml_artifact(
-                                                artifact_name=binary_artifact_name,
-                                            ),
-                                        }
+                                        generate_gocd_yaml_build_artifact(
+                                            artifact_name=binary_artifact_name,
+                                        ),
                                     ]
                                 )
                             }
