@@ -1,0 +1,14 @@
+DOCKER_IMAGES_DIR := ./docker_images
+
+DOCKER_IMAGES := \
+	client \
+	nginx \
+	server
+
+ALL_IMAGES_TARGETS := $(addprefix _build_image_,$(DOCKER_IMAGES))
+
+build_images: $(ALL_IMAGES_TARGETS)
+
+_build_image_%:
+	cd $(DOCKER_IMAGES_DIR) && \
+		docker build -f Dockerfile.$(*) -t infra-$(*):latest .

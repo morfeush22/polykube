@@ -1,0 +1,9 @@
+giterize_gocd_yaml_files:
+# 	cd $(GOCD_YAMLS_DEST_ROOT_DIR) && \
+# 		git init && \
+# 		git add -A && \
+# 		git commit -m "init"
+
+	mkdir -p $(GIT_SERVER_DEST_ROOT_DIR) || exit
+	rm -rf $(GIT_SERVER_DEST_ROOT_DIR)/$(GOCD_YAMLS_RELATIVE_DIR).git || exit
+	git clone --bare $(GOCD_YAMLS_DEST_ROOT_DIR) $(GIT_SERVER_DEST_ROOT_DIR)/$(GOCD_YAMLS_RELATIVE_DIR).git || exit

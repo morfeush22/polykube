@@ -1,0 +1,9 @@
+FROM gocd/gocd-server:v21.2.0
+
+COPY ./cruise-config.xml /godata/config/cruise-config.xml
+
+USER root
+
+RUN chown -R go:root /godata
+
+USER go

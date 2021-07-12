@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="139">
+    <server agentAutoRegisterKey="28fec1d1-64f5-441e-bca9-f99f1910f0e3" webhookSecret="af594c62-a5a7-43bd-ae1b-0e2506d962c7" serverId="3a6d84b5-236c-4e8d-8571-2fc0ba8ffddc" tokenGenerationKey="50bd6c4b-7565-4d7c-b8b7-d00bea4364a1">
+        <backup emailOnSuccess="true" emailOnFailure="true" />
+        <artifacts>
+            <artifactsDir>artifacts</artifactsDir>
+        </artifacts>
+    </server>
+    <config-repos>
+        <config-repo id="test_repo" pluginId="yaml.config.plugin">
+            <git url="/repo/test_repo.git" />
+            <rules>
+                <allow action="refer" type="*">*</allow>
+            </rules>
+        </config-repo>
+    </config-repos>
+    <pipelines group="basic" />
+</cruise>

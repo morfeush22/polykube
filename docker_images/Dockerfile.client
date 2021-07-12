@@ -1,0 +1,54 @@
+FROM gocd/gocd-agent-ubuntu-18.04:v21.2.0
+
+ARG GO_VERSION=go1.16.5
+ARG KIND_VERSION=v0.11.1
+ARG ETCD_VERSION=v3.4.13
+ARG BAZEL_VERSION=2.2.0
+
+
+SHELL ["/bin/bash", "-c"]
+
+USER root
+
+RUN mkdir -p /opt
+
+RUN apt-get update && apt-get install -y \
+	  binutils \
+	  bison \
+      gcc \
+      gnupg \
+      jq \
+      make \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://github.com/coreos/etcd/releases/download/$ETCD_VERSION/etcd-$ETCD_VERSION-linux-amd64.tar.gz \
+  | tar xz -C /opt
+
+RUN curl -fsSL https://bazel.build/bazel-release.pub.gpg \
+  | gpg --dearmor > bazel.gpg
+
+RUN mv bazel.gpg /etc/apt/trusted.gpg.d/
+
+RUN echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" \
+  | tee /etc/apt/sources.list.d/bazel.list
+
+RUN apt-get update && apt-get install -y \
+      bazel=$BAZEL_VERSION \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY bazel.bazelrc /etc/bazel.bazelrc
+
+
+USER go
+
+RUN curl -fsSL https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer \
+  | bash
+
+RUN source /home/go/.gvm/scripts/gvm \
+ && gvm install $GO_VERSION --prefer-binary \
+ && gvm use $GO_VERSION --default
+
+RUN source /home/go/.gvm/scripts/gvm \
+ && GO111MODULE="on" go get sigs.k8s.io/kind@$KIND_VERSION
+
+ENV PATH="/opt/etcd-$ETCD_VERSION-linux-amd64:$PATH"
