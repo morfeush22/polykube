@@ -1,0 +1,10 @@
+run_agent:
+	docker run \
+		--network=host \
+		--group-add "$$(getent group docker | cut -d: -f3)" \
+		--volume /var/run/docker.sock:/var/run/docker.sock \
+		--volume $HOME/Projects/masters/polyrepo/e2e_tests/cluster:/project \
+		-i \
+		-t \
+		--rm \
+		infra-client /bin/bash

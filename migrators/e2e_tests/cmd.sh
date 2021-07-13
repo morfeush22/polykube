@@ -45,9 +45,9 @@ DEST_DIR="_output/dockerized/bin/${GOOS}/${GOARCH}"
 
 mkdir -p "${DEST_DIR}"
 
-cp "${ARTIFACTS_DIR}/kubectl" "./${DEST_DIR}/kubectl"
-cp "${ARTIFACTS_DIR}/kube-apiserver" "./${DEST_DIR}/kube-apiserver"
-cp "${ARTIFACTS_DIR}/kube-controller-manager" "./${DEST_DIR}/kube-controller-manager"
+[[ -f "./${DEST_DIR}/kubectl" ]] || cp "${ARTIFACTS_DIR}/kubectl" "./${DEST_DIR}/kubectl"
+[[ -f "./${DEST_DIR}/kube-apiserver" ]] || cp "${ARTIFACTS_DIR}/kube-apiserver" "./${DEST_DIR}/kube-apiserver"
+[[ -f "./${DEST_DIR}/kube-controller-manager" ]] || cp "${ARTIFACTS_DIR}/kube-controller-manager" "./${DEST_DIR}/kube-controller-manager"
 
 EOF
 

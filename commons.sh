@@ -13,8 +13,8 @@ calculate_package_absolute_path() {
 
   local -r kubernetes_module_spec='k8s.io/kubernetes'
 
-  if [[ "${package}" =~ ^(.*)[[:space:]]\[.*\]$ ]]; then
-    local fixed_package_spec="${BASH_REMATCH[1]}"
+  if [[ "${package}" =~ ^.*[[:space:]]\[(.*)\]$ ]]; then
+    local fixed_package_spec="${BASH_REMATCH[1]%.*}"
     WARN "fixing ${package} to ${fixed_package_spec}"
     calculate_package_absolute_path "${kubernetes_repo_root_dir}" "${fixed_package_spec}" "$3"
   elif [[ "${package}" == "${kubernetes_module_spec}"/* ]]; then
