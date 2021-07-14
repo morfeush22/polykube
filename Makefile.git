@@ -89,13 +89,3 @@ giterize_all_polyrepos_git_repos: $(ALL_POLYREPO_REPO_TARGETS)
 execute_in_all_git_repos: export WHAT=git status
 execute_in_all_git_repos:
 	./execute-in-all-git-repos.sh $(POLYREPO_DEST_ROOT_DIR)
-
-giterize_gocd_yaml_files:
-# 	cd $(GOCD_YAMLS_DEST_ROOT_DIR) && \
-# 		git init && \
-# 		git add -A && \
-# 		git commit -m "init"
-
-	mkdir -p $(GIT_SERVER_DEST_ROOT_DIR) || exit
-	rm -r $(GIT_SERVER_DEST_ROOT_DIR)/$(GOCD_YAMLS_RELATIVE_DIR).git || exit
-	git clone --bare $(GOCD_YAMLS_DEST_ROOT_DIR) $(GIT_SERVER_DEST_ROOT_DIR)/$(GOCD_YAMLS_RELATIVE_DIR).git || exit
