@@ -1,0 +1,47 @@
+GOCD_SERVER_NAME          := gocd_server
+GOCD_SERVER_ENV_FILE_PATH := ./gocd_server.env
+GIT_SERVER_NAME           := git_server
+
+run_agent:
+	docker run \
+		--network=host \
+		--group-add "$$(getent group docker | cut -d: -f3)" \
+		--volume /var/run/docker.sock:/var/run/docker.sock \
+		--volume $HOME/Projects/masters/polyrepo/e2e_tests/cluster:/project \
+		-i \
+		-t \
+		--rm \
+		infra-client /bin/bash
+
+
+run_gocd_server:
+	docker run \
+		--detach \
+		--tty \
+		--name $(GOCD_SERVER_NAME) \
+		--env-file $(GOCD_SERVER_ENV_FILE_PATH) \
+		--publish "$(GOCD_SERVER_LISTEN_PORT):8153" \
+		infra-server
+
+start_gocd_server:
+	docker start $(GOCD_SERVER_NAME)
+
+delete_gocd_server:
+	docker stop $(GOCD_SERVER_NAME)
+	docker rm $(GOCD_SERVER_NAME)
+
+run_git_server:
+	docker run \
+		--detach \
+		--tty \
+		--name $(GIT_SERVER_NAME) \
+		--volume $(GITS_DIRECTORY):/var/lib/git \
+		--publish "$(GIT_SERVER_LISTEN_PORT):80" \
+		cirocosta/gitserver-http
+
+start_git_server:
+	docker start $(GIT_SERVER_NAME)
+
+delete_git_server:
+	docker stop $(GIT_SERVER_NAME)
+	docker rm $(GIT_SERVER_NAME)

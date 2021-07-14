@@ -1,4 +1,6 @@
-include Makefile.base
+include Makefile.vars
+include Makefile.polyrepo_base
+include Makefile.polyrepo_git
 include Makefile.images
-include Makefile.git
-include Makefile.gocd
+include Makefile.infra
+include Makefile.commons

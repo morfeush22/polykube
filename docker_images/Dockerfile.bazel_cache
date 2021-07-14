@@ -1,0 +1,7 @@
+FROM nginx:1.19
+
+RUN mkdir -p /bazel-cache \
+ && chown -R nginx:nginx /bazel-cache
+
+COPY bazel_cache_nginx.conf /etc/nginx/nginx.conf
+COPY bazel_cache_default.conf /etc/nginx/conf.d/default.conf

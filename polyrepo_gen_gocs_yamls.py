@@ -5,8 +5,8 @@ import sys
 import networkx as x
 import yaml
 
-import filter_import_paths as fip
-from gocd_pipeline_templates import generate_binary_component_yaml_file, generate_integration_test_yaml_file, \
+import polyrepo_filter_import_paths as fip
+from polyrepo_gocd_pipeline_templates import generate_binary_component_yaml_file, generate_integration_test_yaml_file, \
     generate_api_yaml_file, generate_plugin_yaml_file, generate_staging_yaml_file, e2e_cluster_pipeline_name, \
     e2e_cmd_pipeline_name, generate_e2e_test_cluster_yaml_file, generate_e2e_test_cmd_yaml_file, artifacts_dir_name
 
@@ -140,13 +140,17 @@ def generate_gocd_yaml_file(node, node_triggers, node_type, node_git_server_repo
         logging.warning(f"could not determine node type and config for {node}")
 
 
+def generate_repo_path(git_server_repos_prefix, node_type, name):
+    return f"{git_server_repos_prefix}/polyrepo/{node_type}/{name}.git"
+
+
 def generate_gocd_yaml_mounter_file(node_type_to_relative_dir, git_server_repos_prefix, gocd_yamls_dest_root_dir):
     mounter_node = "k8s.io/kubernetes/cluster/gce/gci/mounter"
 
     node_type, node_subdir = fip.infer_type_and_subdir(mounter_node)
 
-    node_git_server_repo_path = \
-        f"{git_server_repos_prefix}/{node_type_to_relative_dir[node_type]}/{node_subdir}"
+    node_git_server_repo_path = generate_repo_path(git_server_repos_prefix, node_type_to_relative_dir[node_type],
+                                                   node_subdir)
 
     generate_gocd_yaml_file(mounter_node, [], node_type, node_git_server_repo_path, gocd_yamls_dest_root_dir)
 
@@ -193,11 +197,11 @@ def generate_gocd_yaml_e2e_tests_files(e2e_cluster_test_node_triggers, e2e_cmd_t
 
     group = f"POLYREPO_E2E"
 
-    e2e_cluster_test_node_git_server_repo_path = \
-        f"{git_server_repos_prefix}/{node_type_to_relative_dir[fip.E2E_TEST]}/cluster"
+    e2e_cluster_test_node_git_server_repo_path = generate_repo_path(git_server_repos_prefix,
+                                                                    node_type_to_relative_dir[fip.E2E_TEST], "cluster")
 
-    e2e_cmd_test_node_git_server_repo_path = \
-        f"{git_server_repos_prefix}/{node_type_to_relative_dir[fip.E2E_TEST]}/cmd"
+    e2e_cmd_test_node_git_server_repo_path = generate_repo_path(git_server_repos_prefix,
+                                                                node_type_to_relative_dir[fip.E2E_TEST], "cmd")
 
     e2e_cluster_test_config = generate_e2e_test_cluster_yaml_file(e2e_cluster_test_triggers_list, group,
                                                                   e2e_cluster_test_node_git_server_repo_path,
@@ -250,15 +254,15 @@ def generate_gocd_yaml_files(filtered_aggr_adj_file_merged_path, node_type_to_re
     for node in triggering_integration_tests_nodes:
         node_triggers = x.neighbors(target_deps_graph, node)
         node_type, node_subdir = fip.infer_type_and_subdir(node)
-        node_git_server_repo_path = \
-            f"{git_server_repos_prefix}/{node_type_to_relative_dir[node_type]}/{node_subdir}"
+        node_git_server_repo_path = generate_repo_path(git_server_repos_prefix, node_type_to_relative_dir[node_type],
+                                                       node_subdir)
 
         generate_gocd_yaml_file(node, node_triggers, node_type, node_git_server_repo_path, gocd_yamls_dest_root_dir)
 
     for node in untriggering_nodes:
         node_type, node_subdir = fip.infer_type_and_subdir(node)
-        node_git_server_repo_path = \
-            f"{git_server_repos_prefix}/{node_type_to_relative_dir[node_type]}/{node_subdir}"
+        node_git_server_repo_path = generate_repo_path(git_server_repos_prefix, node_type_to_relative_dir[node_type],
+                                                       node_subdir)
 
         generate_gocd_yaml_file(node, [], node_type, node_git_server_repo_path,
                                 gocd_yamls_dest_root_dir)

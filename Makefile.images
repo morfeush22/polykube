@@ -1,9 +1,9 @@
 DOCKER_IMAGES_DIR := ./docker_images
 
 DOCKER_IMAGES := \
-	client \
-	nginx \
-	server
+	bazel_cache \
+	gocd_client \
+	gocd_server
 
 ALL_IMAGES_TARGETS := $(addprefix _build_image_,$(DOCKER_IMAGES))
 

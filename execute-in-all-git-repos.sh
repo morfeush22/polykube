@@ -9,14 +9,12 @@ LOG_LEVEL_WARN
 main() {
   local all_git_repos_root_dir="$1"
 
-  ls "${all_git_repos_root_dir}"
-
   for git_repo_subdir in $(find "${all_git_repos_root_dir}" -type d -name ".git"); do
     local git_repo_main_dir="${git_repo_subdir%/.git}"
 
     pushd "${git_repo_main_dir}" || return
 
-    ${WHAT}
+    eval "${WHAT}"
 
     popd
   done
