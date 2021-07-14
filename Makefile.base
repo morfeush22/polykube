@@ -186,16 +186,12 @@ PLUGINS_RELATIVE_DIR           := plugins
 STAGING_RELATIVE_DIR           := staging
 E2E_TESTS_RELATIVE_DIR         := e2e_tests
 
-GIT_SERVER_RELATIVE_DIR := git
-
 POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR := $(POLYREPO_DEST_ROOT_DIR)/$(BINARY_COMPONENTS_RELATIVE_DIR)
 POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR := $(POLYREPO_DEST_ROOT_DIR)/$(INTEGRATION_TESTS_RELATIVE_DIR)
 POLYREPO_APIS_DEST_ROOT_DIR              := $(POLYREPO_DEST_ROOT_DIR)/$(APIS_RELATIVE_DIR)
 POLYREPO_PLUGINS_DEST_ROOT_DIR           := $(POLYREPO_DEST_ROOT_DIR)/$(PLUGINS_RELATIVE_DIR)
 POLYREPO_STAGING_DEST_ROOT_DIR           := $(POLYREPO_DEST_ROOT_DIR)/$(STAGING_RELATIVE_DIR)
 POLYREPO_E2E_TESTS_DEST_ROOT_DIR         := $(POLYREPO_DEST_ROOT_DIR)/$(E2E_TESTS_RELATIVE_DIR)
-
-GIT_SERVER_DEST_ROOT_DIR := $(POLYREPO_DEST_ROOT_DIR)/$(GIT_SERVER_RELATIVE_DIR)
 
 clean:
 	rm -rf $(POLYREPO_DEST_ROOT_DIR)
@@ -219,99 +215,99 @@ _create_e2e_test_subdir_%:
 	mkdir -p $(POLYREPO_E2E_TESTS_DEST_ROOT_DIR)/$(*)
 
 _migrate_binary_component_common_%:
-	migrators/whisky-on-ice.sh \
+	migrators_polyrepo/whisky-on-ice.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		$($(*)_RELATIVE_SUBPATH) \
 		$(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*)
 
 _migrate_binary_component_common_apiextensions-apiserver:
-	migrators/whisky-on-rocks.sh \
+	migrators_polyrepo/whisky-on-rocks.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		$(apiextensions-apiserver_RELATIVE_SUBPATH) \
 		$(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/apiextensions-apiserver
 
 _migrate_binary_component_common_kube-aggregator:
-	migrators/whisky-on-rocks.sh \
+	migrators_polyrepo/whisky-on-rocks.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		$(kube-aggregator_RELATIVE_SUBPATH) \
 		$(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/kube-aggregator
 
 _migrate_integration_test_common_%:
-	migrators/whisky-on-ice.sh \
+	migrators_polyrepo/whisky-on-ice.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		test/integration/$(*) \
 		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*)
 
 _migrate_integration_test_common_apiextensions-apiserver:
-	migrators/whisky-on-rocks.sh \
+	migrators_polyrepo/whisky-on-rocks.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		$(apiextensions-apiserver_RELATIVE_SUBPATH)/test/integration \
 		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/apiextensions-apiserver
 
 _migrate_api_common_%:
-	migrators/whisky-on-ice.sh \
+	migrators_polyrepo/whisky-on-ice.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		pkg/$(*) \
 		$(POLYREPO_APIS_DEST_ROOT_DIR)/$(*)
 
 _migrate_plugin_common_%:
-	migrators/whisky-on-ice.sh \
+	migrators_polyrepo/whisky-on-ice.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		plugin/pkg/$(*) \
 		$(POLYREPO_PLUGINS_DEST_ROOT_DIR)/$(*)
 
 _migrate_staging_common_%:
-	migrators/whisky-on-rocks.sh \
+	migrators_polyrepo/whisky-on-rocks.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		staging/src/k8s.io/$(*) \
 		$(POLYREPO_STAGING_DEST_ROOT_DIR)/$(*)
 
 _migrate_binary_component_to_polyrepo_%: _create_binary_component_subdir_% _migrate_binary_component_common_%
-	migrators/binary_components/$(*).sh \
+	migrators_polyrepo/binary_components/$(*).sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		$($(*)_RELATIVE_SUBPATH) \
 		$(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*)
 
 _migrate_integration_test_to_polyrepo_%: _create_integration_test_subdir_% _migrate_integration_test_common_%
-	migrators/integration_tests/$(*).sh \
+	migrators_polyrepo/integration_tests/$(*).sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		test/integration/$(*) \
 		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*)
 
 _migrate_integration_test_to_polyrepo_apiextensions-apiserver: _migrate_integration_test_common_apiextensions-apiserver
 _migrate_integration_test_to_polyrepo_apiextensions-apiserver: _create_integration_test_subdir_apiextensions-apiserver
-	migrators/integration_tests/apiextensions-apiserver.sh \
+	migrators_polyrepo/integration_tests/apiextensions-apiserver.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		$(apiextensions-apiserver_RELATIVE_SUBPATH)/test/integration \
 		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/apiextensions-apiserver
 
 _migrate_api_to_polyrepo_%: _create_api_subdir_% _migrate_api_common_%
-	migrators/apis/$(*).sh \
+	migrators_polyrepo/apis/$(*).sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		pkg/$(*) \
 		$(POLYREPO_APIS_DEST_ROOT_DIR)/$(*)
 
 _migrate_plugin_to_polyrepo_%: _create_plugin_subdir_% _migrate_plugin_common_%
-	migrators/plugins/$(*).sh \
+	migrators_polyrepo/plugins/$(*).sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		plugin/pkg/$(*) \
 		$(POLYREPO_PLUGINS_DEST_ROOT_DIR)/$(*)
 
 _migrate_staging_to_polyrepo_%: _create_staging_subdir_% _migrate_staging_common_%
-	migrators/staging/$(*).sh \
+	migrators_polyrepo/staging/$(*).sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		staging/src/k8s.io/$(*) \
 		$(POLYREPO_STAGING_DEST_ROOT_DIR)/$(*)
 
 _migrate_e2e_test_to_polyrepo_cmd: _create_e2e_test_subdir_cmd
 _migrate_e2e_test_to_polyrepo_cmd:
-	migrators/e2e_tests/cmd.sh \
+	migrators_polyrepo/e2e_tests/cmd.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		$(POLYREPO_E2E_TESTS_DEST_ROOT_DIR)/cmd
 
 _migrate_e2e_test_to_polyrepo_cluster: _create_e2e_test_subdir_cluster
 _migrate_e2e_test_to_polyrepo_cluster:
-	migrators/e2e_tests/cluster.sh \
+	migrators_polyrepo/e2e_tests/cluster.sh \
 		$(KUBERNETES_REPO_ROOT_DIR) \
 		$(POLYREPO_E2E_TESTS_DEST_ROOT_DIR)/cluster
 

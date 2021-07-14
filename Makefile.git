@@ -1,3 +1,95 @@
+GIT_SERVER_RELATIVE_DIR  := git
+GIT_SERVER_DEST_ROOT_DIR := $(POLYREPO_DEST_ROOT_DIR)/$(GIT_SERVER_RELATIVE_DIR)
+
+POLYREPO_GITS_DEST_DIR := /hdd/polyrepo_gits
+
+POLYREPO_BINARY_COMPONENTS_REPOS_TARGETS := $(addprefix _polyrepo_binary_component_,$(KUBERNETES_BINARY_COMPONENTS))
+POLYREPO_INTEGRATION_TESTS_REPOS_TARGETS := $(addprefix _polyrepo_integration_test_,$(KUBERNETES_INTEGRATION_TESTS))
+POLYREPO_APIS_REPOS_TARGETS              := $(addprefix _polyrepo_api_,$(KUBERNETES_APIS))
+POLYREPO_PLUGINS_REPOS_TARGETS           := $(addprefix _polyrepo_plugin_,$(KUBERNETES_PLUGINS))
+POLYREPO_STAGING_REPOS_TARGETS           := $(addprefix _polyrepo_staging_,$(KUBERNETES_STAGING))
+POLYREPO_E2E_TESTS_REPOS_TARGETS         := $(addprefix _polyrepo_e2e_test_,$(KUBERNETES_E2E_TESTS))
+POLYREPO_GOCD_YAMLS_REPO_TARGET          := _polyrepo_gocd_yamls
+
+ALL_POLYREPO_REPO_TARGETS := \
+	$(POLYREPO_BINARY_COMPONENTS_REPOS_TARGETS) \
+	$(POLYREPO_INTEGRATION_TESTS_REPOS_TARGETS) \
+	$(POLYREPO_APIS_REPOS_TARGETS) \
+	$(POLYREPO_PLUGINS_REPOS_TARGETS) \
+	$(POLYREPO_STAGING_REPOS_TARGETS) \
+	$(POLYREPO_E2E_TESTS_REPOS_TARGETS) \
+	$(POLYREPO_GOCD_YAMLS_REPO_TARGET)
+
+POLYREPO_BINARY_COMPONENTS_REPO_DEST_ROOT_DIR := $(POLYREPO_GITS_DEST_DIR)/$(BINARY_COMPONENTS_RELATIVE_DIR)
+POLYREPO_INTEGRATION_TESTS_REPO_DEST_ROOT_DIR := $(POLYREPO_GITS_DEST_DIR)/$(INTEGRATION_TESTS_RELATIVE_DIR)
+POLYREPO_APIS_REPO_DEST_ROOT_DIR              := $(POLYREPO_GITS_DEST_DIR)/$(APIS_RELATIVE_DIR)
+POLYREPO_PLUGINS_REPO_DEST_ROOT_DIR           := $(POLYREPO_GITS_DEST_DIR)/$(PLUGINS_RELATIVE_DIR)
+POLYREPO_STAGING_REPO_DEST_ROOT_DIR           := $(POLYREPO_GITS_DEST_DIR)/$(STAGING_RELATIVE_DIR)
+POLYREPO_E2E_TESTS_REPO_DEST_ROOT_DIR         := $(POLYREPO_GITS_DEST_DIR)/$(E2E_TESTS_RELATIVE_DIR)
+POLYREPO_GOCD_YAMLS_REPO_DEST_ROOT_DIR        := $(POLYREPO_GITS_DEST_DIR)/$(GOCD_YAMLS_RELATIVE_DIR)
+
+_polyrepo_binary_component_%:
+	rm -rf $(POLYREPO_BINARY_COMPONENTS_REPO_DEST_ROOT_DIR)/$(*).git
+	mkdir -p $(POLYREPO_BINARY_COMPONENTS_REPO_DEST_ROOT_DIR)/$(*).git
+
+	./polyrepo-git-bootstrap.sh \
+		$(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*) \
+		$(POLYREPO_BINARY_COMPONENTS_REPO_DEST_ROOT_DIR)/$(*).git
+
+_polyrepo_integration_test_%:
+	rm -rf $(POLYREPO_INTEGRATION_TESTS_REPO_DEST_ROOT_DIR)/$(*).git
+	mkdir -p $(POLYREPO_INTEGRATION_TESTS_REPO_DEST_ROOT_DIR)/$(*).git
+
+	./polyrepo-git-bootstrap.sh \
+		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*) \
+		$(POLYREPO_INTEGRATION_TESTS_REPO_DEST_ROOT_DIR)/$(*).git
+
+_polyrepo_api_%:
+	rm -rf $(POLYREPO_APIS_REPO_DEST_ROOT_DIR)/$(*).git
+	mkdir -p $(POLYREPO_APIS_REPO_DEST_ROOT_DIR)/$(*).git
+
+	./polyrepo-git-bootstrap.sh \
+		$(POLYREPO_APIS_DEST_ROOT_DIR)/$(*) \
+		$(POLYREPO_APIS_REPO_DEST_ROOT_DIR)/$(*).git
+
+_polyrepo_plugin_%:
+	rm -rf $(POLYREPO_PLUGINS_REPO_DEST_ROOT_DIR)/$(*).git
+	mkdir -p $(POLYREPO_PLUGINS_REPO_DEST_ROOT_DIR)/$(*).git
+
+	./polyrepo-git-bootstrap.sh \
+		$(POLYREPO_PLUGINS_DEST_ROOT_DIR)/$(*) \
+		$(POLYREPO_PLUGINS_REPO_DEST_ROOT_DIR)/$(*).git
+
+_polyrepo_staging_%:
+	rm -rf $(POLYREPO_STAGING_REPO_DEST_ROOT_DIR)/$(*).git
+	mkdir -p $(POLYREPO_STAGING_REPO_DEST_ROOT_DIR)/$(*).git
+
+	./polyrepo-git-bootstrap.sh \
+		$(POLYREPO_STAGING_DEST_ROOT_DIR)/$(*) \
+		$(POLYREPO_STAGING_REPO_DEST_ROOT_DIR)/$(*).git
+
+_polyrepo_e2e_test_%:
+	rm -rf $(POLYREPO_E2E_TESTS_REPO_DEST_ROOT_DIR)/$(*).git
+	mkdir -p $(POLYREPO_E2E_TESTS_REPO_DEST_ROOT_DIR)/$(*).git
+
+	./polyrepo-git-bootstrap.sh \
+		$(POLYREPO_E2E_TESTS_DEST_ROOT_DIR)/$(*) \
+		$(POLYREPO_E2E_TESTS_REPO_DEST_ROOT_DIR)/$(*).git
+
+_polyrepo_gocd_yamls:
+	rm -rf $(POLYREPO_GOCD_YAMLS_REPO_DEST_ROOT_DIR).git
+	mkdir -p $(POLYREPO_GOCD_YAMLS_REPO_DEST_ROOT_DIR).git
+
+	./polyrepo-git-bootstrap.sh \
+		$(GOCD_YAMLS_DEST_ROOT_DIR) \
+		$(POLYREPO_GOCD_YAMLS_REPO_DEST_ROOT_DIR).git
+
+giterize_all_polyrepos_git_repos: $(ALL_POLYREPO_REPO_TARGETS)
+
+execute_in_all_git_repos: export WHAT=git status
+execute_in_all_git_repos:
+	./execute-in-all-git-repos.sh $(POLYREPO_DEST_ROOT_DIR)
+
 giterize_gocd_yaml_files:
 # 	cd $(GOCD_YAMLS_DEST_ROOT_DIR) && \
 # 		git init && \
@@ -5,5 +97,5 @@ giterize_gocd_yaml_files:
 # 		git commit -m "init"
 
 	mkdir -p $(GIT_SERVER_DEST_ROOT_DIR) || exit
-	rm -rf $(GIT_SERVER_DEST_ROOT_DIR)/$(GOCD_YAMLS_RELATIVE_DIR).git || exit
+	rm -r $(GIT_SERVER_DEST_ROOT_DIR)/$(GOCD_YAMLS_RELATIVE_DIR).git || exit
 	git clone --bare $(GOCD_YAMLS_DEST_ROOT_DIR) $(GIT_SERVER_DEST_ROOT_DIR)/$(GOCD_YAMLS_RELATIVE_DIR).git || exit
