@@ -55,7 +55,41 @@ def generate_binary_component_gocd_yaml_job(artifacts):
 
 
 def generate_integration_test_gocd_yaml_job():
-    return generate_gocd_yaml_common_job([])
+    return {
+        "timeout": 0,
+        "tasks": [
+            {
+                "exec": {
+                    "arguments": [
+                        "-c",
+                        "make setup"
+                    ],
+                    "command": "/bin/sh",
+                    "run_if": "passed"
+                }
+            },
+            {
+                "exec": {
+                    "arguments": [
+                        "-c",
+                        "make all"
+                    ],
+                    "command": "/bin/sh",
+                    "run_if": "passed"
+                }
+            },
+            {
+                "exec": {
+                    "arguments": [
+                        "-c",
+                        "make teardown"
+                    ],
+                    "command": "/bin/sh",
+                    "run_if": "any"
+                }
+            },
+        ],
+    }
 
 
 def generate_api_gocd_yaml_job():
@@ -131,7 +165,7 @@ def generate_e2e_cluster_test_gocd_yaml_job(fetch_artifacts_list):
                         "make teardown"
                     ],
                     "command": "/bin/sh",
-                    "run_if": "always"
+                    "run_if": "any"
                 }
             },
         ],

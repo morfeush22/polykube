@@ -150,7 +150,7 @@ def generate_gocd_yaml_mounter_file(node_type_to_relative_dir, git_server_repos_
     node_type, node_subdir = fip.infer_type_and_subdir(mounter_node)
 
     node_git_server_repo_path = generate_repo_path(git_server_repos_prefix, node_type_to_relative_dir[node_type],
-                                                   node_subdir)
+                                                   mounter_node.split("/")[-1])
 
     generate_gocd_yaml_file(mounter_node, [], node_type, node_git_server_repo_path, gocd_yamls_dest_root_dir)
 

@@ -30,6 +30,12 @@ delete_gocd_server:
 	docker stop $(GOCD_SERVER_NAME)
 	docker rm $(GOCD_SERVER_NAME)
 
+pause_all_pipelines:
+	./pause-all-pipelines.sh $(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)
+
+unpause_all_pipelines:
+	./unpause-all-pipelines.sh $(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)
+
 run_git_server:
 	docker run \
 		--detach \

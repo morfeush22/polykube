@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+set -o errexit
+set -o nounset
+set -o pipefail
+
 # shellcheck disable=SC1090
 source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/commons.sh
 source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/b-log.sh
