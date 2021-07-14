@@ -18,9 +18,9 @@ run_gocd_server:
 	docker run \
 		--detach \
 		--tty \
+		--network=host \
 		--name $(GOCD_SERVER_NAME) \
 		--env-file $(GOCD_SERVER_ENV_FILE_PATH) \
-		--publish "$(GOCD_SERVER_LISTEN_PORT):8153" \
 		infra-server
 
 start_gocd_server:

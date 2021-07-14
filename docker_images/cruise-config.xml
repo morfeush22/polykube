@@ -7,12 +7,11 @@
         </artifacts>
     </server>
     <config-repos>
-        <config-repo id="test_repo" pluginId="yaml.config.plugin">
-            <git url="/repo/test_repo.git" />
+        <config-repo id="polyrepo" pluginId="yaml.config.plugin">
+            <git url="http://localhost:8080/polyrepo/gocd_yamls.git" />
             <rules>
                 <allow action="refer" type="*">*</allow>
             </rules>
         </config-repo>
     </config-repos>
-    <pipelines group="basic" />
 </cruise>
