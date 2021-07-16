@@ -17,17 +17,25 @@ calculate_package_absolute_path() {
 
   local -r kubernetes_module_spec='k8s.io/kubernetes'
 
-  if [[ "${package}" =~ ^.*[[:space:]]\[(.*)\]$ ]]; then
-    local fixed_package_spec="${BASH_REMATCH[1]%.*}"
-    WARN "fixing ${package} to ${fixed_package_spec}"
-    calculate_package_absolute_path "${kubernetes_repo_root_dir}" "${fixed_package_spec}" "$3"
-  elif [[ "${package}" == "${kubernetes_module_spec}"/* ]]; then
+  if [[ "${package}" == "${kubernetes_module_spec}"/* ]]; then
     absolute_path="${kubernetes_repo_root_dir}/${package##${kubernetes_module_spec}/}"
   elif [[ "${package}" == vendor/* ]]; then
     absolute_path="${kubernetes_repo_root_dir}/${package}"
   else
     # shellcheck disable=SC2034
     absolute_path="${kubernetes_repo_root_dir}/vendor/${package}"
+  fi
+}
+
+add_to_array_if_package_path_exist() {
+  local package_absolute_path="$1"
+
+  local -n dest_array="$2"
+
+  if [[ ! -d "${package_absolute_path}" ]]; then
+    WARN "${package_absolute_path} does not exist, skipping"
+  else
+    dest_array+=("${package_absolute_path}")
   fi
 }
 
@@ -45,13 +53,23 @@ extract_internal_dependencies_from_go_package_deps() {
   for kub_package in "${kub_package_array[@]}"; do
     local kub_package_absolute_path
 
-    calculate_package_absolute_path "${kubernetes_repo_root_dir}" "${kub_package}" kub_package_absolute_path
+    if [[ "${kub_package}" =~ ^(.*)[[:space:]]\[(.*)\]$ ]]; then
+      local fixed_package_spec_1="${BASH_REMATCH[1]}"
+      local fixed_package_spec_2="${BASH_REMATCH[2]%.*}"
 
-    if [[ ! -d "${kub_package_absolute_path}" ]]; then
-      WARN "${kub_package_absolute_path} does not exist, skipping"
-    else
-      kub_package_absolute_path_array+=("${kub_package_absolute_path}")
+      WARN "fixing ${kub_package} to ${fixed_package_spec_1} and ${fixed_package_spec_2}"
+
+      calculate_package_absolute_path "${kubernetes_repo_root_dir}" "${fixed_package_spec_1}" kub_package_absolute_path
+      add_to_array_if_package_path_exist "${kub_package_absolute_path}" kub_package_absolute_path_array
+
+      calculate_package_absolute_path "${kubernetes_repo_root_dir}" "${fixed_package_spec_2}" kub_package_absolute_path
+      add_to_array_if_package_path_exist "${kub_package_absolute_path}" kub_package_absolute_path_array
+
+      continue
     fi
+
+    calculate_package_absolute_path "${kubernetes_repo_root_dir}" "${kub_package}" kub_package_absolute_path
+    add_to_array_if_package_path_exist "${kub_package_absolute_path}" kub_package_absolute_path_array
   done
 }
 
