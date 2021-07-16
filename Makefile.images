@@ -3,6 +3,7 @@ AGENT_AUTO_REGISTER_KEY := 28fec1d1-64f5-441e-bca9-f99f1910f0e3
 
 DOCKER_IMAGES := \
 	bazel_cache \
+	git_server \
 	gocd_client \
 	gocd_server
 

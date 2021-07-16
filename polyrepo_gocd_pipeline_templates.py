@@ -13,6 +13,7 @@ def generate_gocd_yaml_common_job(artifacts):
             {
                 "exec": {
                     "arguments": [
+                        "-l",
                         "-c",
                         "make all"
                     ],
@@ -32,6 +33,7 @@ def generate_binary_component_gocd_yaml_job(artifacts):
             {
                 "exec": {
                     "arguments": [
+                        "-l",
                         "-c",
                         "make build"
                     ],
@@ -42,6 +44,7 @@ def generate_binary_component_gocd_yaml_job(artifacts):
             {
                 "exec": {
                     "arguments": [
+                        "-l",
                         "-c",
                         "make tests"
                     ],
@@ -61,6 +64,7 @@ def generate_integration_test_gocd_yaml_job():
             {
                 "exec": {
                     "arguments": [
+                        "-l",
                         "-c",
                         "make setup"
                     ],
@@ -71,6 +75,7 @@ def generate_integration_test_gocd_yaml_job():
             {
                 "exec": {
                     "arguments": [
+                        "-l",
                         "-c",
                         "make all"
                     ],
@@ -81,6 +86,7 @@ def generate_integration_test_gocd_yaml_job():
             {
                 "exec": {
                     "arguments": [
+                        "-l",
                         "-c",
                         "make teardown"
                     ],
@@ -131,6 +137,7 @@ def generate_e2e_cluster_test_gocd_yaml_job(fetch_artifacts_list):
             {
                 "exec": {
                     "arguments": [
+                        "-l",
                         "-c",
                         "make bootstrap"
                     ],
@@ -141,6 +148,7 @@ def generate_e2e_cluster_test_gocd_yaml_job(fetch_artifacts_list):
             {
                 "exec": {
                     "arguments": [
+                        "-l",
                         "-c",
                         "make setup"
                     ],
@@ -151,6 +159,7 @@ def generate_e2e_cluster_test_gocd_yaml_job(fetch_artifacts_list):
             {
                 "exec": {
                     "arguments": [
+                        "-l",
                         "-c",
                         "make cluster"
                     ],
@@ -161,6 +170,7 @@ def generate_e2e_cluster_test_gocd_yaml_job(fetch_artifacts_list):
             {
                 "exec": {
                     "arguments": [
+                        "-l",
                         "-c",
                         "make teardown"
                     ],
@@ -188,6 +198,7 @@ def generate_e2e_cmd_test_gocd_yaml_job(fetch_artifacts_list):
             {
                 "exec": {
                     "arguments": [
+                        "-l",
                         "-c",
                         "make bootstrap"
                     ],
@@ -198,6 +209,7 @@ def generate_e2e_cmd_test_gocd_yaml_job(fetch_artifacts_list):
             {
                 "exec": {
                     "arguments": [
+                        "-l",
                         "-c",
                         "make cmd"
                     ],

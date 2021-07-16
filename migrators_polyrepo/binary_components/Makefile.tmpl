@@ -1,6 +1,4 @@
-SHELL := /bin/bash
-
-{{ $target := (getenv "TARGET") -}}
+{{- $target := (getenv "TARGET") -}}
 {{- $ldflags := join (getenv "BUILD_FLAGS" "[]" | yamlArray) " " -}}
 {{- $bin := filepath.Base $target -}}
 

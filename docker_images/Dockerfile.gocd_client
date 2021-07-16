@@ -55,7 +55,4 @@ RUN source /home/go/.gvm/scripts/gvm \
 RUN source /home/go/.gvm/scripts/gvm \
  && GO111MODULE="on" go get sigs.k8s.io/kind@$KIND_VERSION
 
-RUN source /home/go/.gvm/scripts/gvm \
- && printf '\nset -a; eval `go env`; set +a\n' >> /home/go/.bashrc
-
 ENV PATH="/opt/etcd-$ETCD_VERSION-linux-amd64:$PATH"
