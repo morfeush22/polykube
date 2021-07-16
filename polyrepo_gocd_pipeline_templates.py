@@ -16,7 +16,7 @@ def generate_gocd_yaml_common_job(artifacts):
                         "-c",
                         "make all"
                     ],
-                    "command": "/bin/sh",
+                    "command": "/bin/bash",
                     "run_if": "passed"
                 }
             }
@@ -35,7 +35,7 @@ def generate_binary_component_gocd_yaml_job(artifacts):
                         "-c",
                         "make build"
                     ],
-                    "command": "/bin/sh",
+                    "command": "/bin/bash",
                     "run_if": "passed"
                 }
             },
@@ -45,7 +45,7 @@ def generate_binary_component_gocd_yaml_job(artifacts):
                         "-c",
                         "make tests"
                     ],
-                    "command": "/bin/sh",
+                    "command": "/bin/bash",
                     "run_if": "passed"
                 }
             }
@@ -64,7 +64,7 @@ def generate_integration_test_gocd_yaml_job():
                         "-c",
                         "make setup"
                     ],
-                    "command": "/bin/sh",
+                    "command": "/bin/bash",
                     "run_if": "passed"
                 }
             },
@@ -74,7 +74,7 @@ def generate_integration_test_gocd_yaml_job():
                         "-c",
                         "make all"
                     ],
-                    "command": "/bin/sh",
+                    "command": "/bin/bash",
                     "run_if": "passed"
                 }
             },
@@ -84,7 +84,7 @@ def generate_integration_test_gocd_yaml_job():
                         "-c",
                         "make teardown"
                     ],
-                    "command": "/bin/sh",
+                    "command": "/bin/bash",
                     "run_if": "any"
                 }
             },
@@ -134,7 +134,7 @@ def generate_e2e_cluster_test_gocd_yaml_job(fetch_artifacts_list):
                         "-c",
                         "make bootstrap"
                     ],
-                    "command": "/bin/sh",
+                    "command": "/bin/bash",
                     "run_if": "passed"
                 }
             },
@@ -144,7 +144,7 @@ def generate_e2e_cluster_test_gocd_yaml_job(fetch_artifacts_list):
                         "-c",
                         "make setup"
                     ],
-                    "command": "/bin/sh",
+                    "command": "/bin/bash",
                     "run_if": "passed"
                 }
             },
@@ -154,7 +154,7 @@ def generate_e2e_cluster_test_gocd_yaml_job(fetch_artifacts_list):
                         "-c",
                         "make cluster"
                     ],
-                    "command": "/bin/sh",
+                    "command": "/bin/bash",
                     "run_if": "passed"
                 }
             },
@@ -164,7 +164,7 @@ def generate_e2e_cluster_test_gocd_yaml_job(fetch_artifacts_list):
                         "-c",
                         "make teardown"
                     ],
-                    "command": "/bin/sh",
+                    "command": "/bin/bash",
                     "run_if": "any"
                 }
             },
@@ -191,7 +191,7 @@ def generate_e2e_cmd_test_gocd_yaml_job(fetch_artifacts_list):
                         "-c",
                         "make bootstrap"
                     ],
-                    "command": "/bin/sh",
+                    "command": "/bin/bash",
                     "run_if": "passed"
                 }
             },
@@ -201,7 +201,7 @@ def generate_e2e_cmd_test_gocd_yaml_job(fetch_artifacts_list):
                         "-c",
                         "make cmd"
                     ],
-                    "command": "/bin/sh",
+                    "command": "/bin/bash",
                     "run_if": "passed"
                 }
             }

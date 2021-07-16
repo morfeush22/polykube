@@ -1,24 +1,35 @@
+GOCD_CLIENT_NAME          := gocd_client
 GOCD_SERVER_NAME          := gocd_server
 GOCD_SERVER_ENV_FILE_PATH := ./gocd_server.env
 GIT_SERVER_NAME           := git_server
-
-# TODO
-run_agent:
-	docker run \
-		--network=host \
-		--group-add "$$(getent group docker | cut -d: -f3)" \
-		--volume /var/run/docker.sock:/var/run/docker.sock \
-		--volume $HOME/Projects/masters/polyrepo/e2e_tests/cluster:/project \
-		-i \
-		-t \
-		--rm \
-		infra-gocd_client:latest /bin/bash
 
 pause_all_pipelines:
 	./pause-all-pipelines.sh $(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)
 
 unpause_all_pipelines:
 	./unpause-all-pipelines.sh $(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)
+
+run_gocd_client:
+	docker run \
+		--detach \
+		--tty \
+		--network=host \
+		--name $(GOCD_CLIENT_NAME) \
+		--group-add "$$(getent group docker | cut -d: -f3)" \
+		--volume /var/run/docker.sock:/var/run/docker.sock \
+		--env GO_SERVER_URL="http://$(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)/go" \
+		--env AGENT_AUTO_REGISTER_KEY="$(AGENT_AUTO_REGISTER_KEY)" \
+		--env AGENT_AUTO_REGISTER_HOSTNAME="$(GOCD_CLIENT_NAME)" \
+		infra-gocd_client:latest
+
+start_gocd_client:
+	docker start $(GOCD_CLIENT_NAME)
+
+stop_gocd_client:
+	docker stop $(GOCD_CLIENT_NAME)
+
+delete_gocd_client: stop_gocd_client
+	docker rm $(GOCD_CLIENT_NAME)
 
 run_gocd_server:
 	docker run \
