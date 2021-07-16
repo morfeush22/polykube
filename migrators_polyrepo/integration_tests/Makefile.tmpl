@@ -1,4 +1,6 @@
-{{- $test_targets_escaped := dict -}}
+SHELL := /bin/bash
+
+{{ $test_targets_escaped := dict -}}
 
 {{- range $test_target := (getenv "TEST_TARGETS" | yamlArray) -}}
 {{- $test_targets_escaped = merge $test_targets_escaped (dict (strings.ReplaceAll "/" "_" $test_target) $test_target) -}}

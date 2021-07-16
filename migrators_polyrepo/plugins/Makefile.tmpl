@@ -1,4 +1,6 @@
-{{- $targets := (getenv "TARGETS" | yamlArray) -}}
+SHELL := /bin/bash
+
+{{ $targets := (getenv "TARGETS" | yamlArray) -}}
 
 all: tests
 

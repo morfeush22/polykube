@@ -1,4 +1,6 @@
-{{- $targets := (getenv "TARGETS" | yamlArray) -}}
+SHELL := /bin/bash
+
+{{ $targets := (getenv "TARGETS" | yamlArray) -}}
 all: {{ join $targets " " | strings.ReplaceAll "/" "_" }}
 {{ range $_, $target := $targets }}
 {{ strings.ReplaceAll "/" "_" $target }}:
