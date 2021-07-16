@@ -24,6 +24,8 @@ RUN apt-get update && apt-get install -y \
 RUN curl -fsSL https://github.com/coreos/etcd/releases/download/$ETCD_VERSION/etcd-$ETCD_VERSION-linux-amd64.tar.gz \
   | tar xz -C /opt
 
+ENV PATH="/opt/etcd-$ETCD_VERSION-linux-amd64:$PATH"
+
 RUN curl -fsSL https://get.docker.com \
   | bash \
  && rm -rf /var/lib/apt/lists/*
@@ -42,17 +44,11 @@ RUN apt-get update && apt-get install -y \
 
 COPY bazel.bazelrc /etc/bazel.bazelrc
 
+RUN curl -fsSL https://golang.org/dl/$GO_VERSION.linux-amd64.tar.gz \
+  | tar xz -C /usr/local
+
+ENV PATH="/usr/local/go/bin:$PATH"
+
+RUN GO111MODULE="on" go get sigs.k8s.io/kind@$KIND_VERSION
 
 USER go
-
-RUN curl -fsSL https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer \
-  | bash
-
-RUN source /home/go/.gvm/scripts/gvm \
- && gvm install $GO_VERSION --prefer-binary \
- && gvm use $GO_VERSION --default
-
-RUN source /home/go/.gvm/scripts/gvm \
- && GO111MODULE="on" go get sigs.k8s.io/kind@$KIND_VERSION
-
-ENV PATH="/opt/etcd-$ETCD_VERSION-linux-amd64:$PATH"

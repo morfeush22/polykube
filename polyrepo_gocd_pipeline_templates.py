@@ -1,4 +1,5 @@
 _all = "all"
+_pre_arguments = "set -a; eval `go env`; set +a;"
 
 artifacts_dir_name = "_artifacts"
 
@@ -13,9 +14,8 @@ def generate_gocd_yaml_common_job(artifacts):
             {
                 "exec": {
                     "arguments": [
-                        "-l",
                         "-c",
-                        "make all"
+                        f"{_pre_arguments} make all"
                     ],
                     "command": "/bin/bash",
                     "run_if": "passed"
@@ -33,9 +33,8 @@ def generate_binary_component_gocd_yaml_job(artifacts):
             {
                 "exec": {
                     "arguments": [
-                        "-l",
                         "-c",
-                        "make build"
+                        f"{_pre_arguments} make build"
                     ],
                     "command": "/bin/bash",
                     "run_if": "passed"
@@ -44,9 +43,8 @@ def generate_binary_component_gocd_yaml_job(artifacts):
             {
                 "exec": {
                     "arguments": [
-                        "-l",
                         "-c",
-                        "make tests"
+                        f"{_pre_arguments} make tests"
                     ],
                     "command": "/bin/bash",
                     "run_if": "passed"
@@ -64,9 +62,8 @@ def generate_integration_test_gocd_yaml_job():
             {
                 "exec": {
                     "arguments": [
-                        "-l",
                         "-c",
-                        "make setup"
+                        f"{_pre_arguments} make setup"
                     ],
                     "command": "/bin/bash",
                     "run_if": "passed"
@@ -75,9 +72,8 @@ def generate_integration_test_gocd_yaml_job():
             {
                 "exec": {
                     "arguments": [
-                        "-l",
                         "-c",
-                        "make all"
+                        f"{_pre_arguments} make all"
                     ],
                     "command": "/bin/bash",
                     "run_if": "passed"
@@ -86,9 +82,8 @@ def generate_integration_test_gocd_yaml_job():
             {
                 "exec": {
                     "arguments": [
-                        "-l",
                         "-c",
-                        "make teardown"
+                        f"{_pre_arguments} make teardown"
                     ],
                     "command": "/bin/bash",
                     "run_if": "any"
@@ -137,9 +132,8 @@ def generate_e2e_cluster_test_gocd_yaml_job(fetch_artifacts_list):
             {
                 "exec": {
                     "arguments": [
-                        "-l",
                         "-c",
-                        "make bootstrap"
+                        f"{_pre_arguments} make bootstrap"
                     ],
                     "command": "/bin/bash",
                     "run_if": "passed"
@@ -148,9 +142,8 @@ def generate_e2e_cluster_test_gocd_yaml_job(fetch_artifacts_list):
             {
                 "exec": {
                     "arguments": [
-                        "-l",
                         "-c",
-                        "make setup"
+                        f"{_pre_arguments} make setup"
                     ],
                     "command": "/bin/bash",
                     "run_if": "passed"
@@ -159,9 +152,8 @@ def generate_e2e_cluster_test_gocd_yaml_job(fetch_artifacts_list):
             {
                 "exec": {
                     "arguments": [
-                        "-l",
                         "-c",
-                        "make cluster"
+                        f"{_pre_arguments} make cluster"
                     ],
                     "command": "/bin/bash",
                     "run_if": "passed"
@@ -170,9 +162,8 @@ def generate_e2e_cluster_test_gocd_yaml_job(fetch_artifacts_list):
             {
                 "exec": {
                     "arguments": [
-                        "-l",
                         "-c",
-                        "make teardown"
+                        f"{_pre_arguments} make teardown"
                     ],
                     "command": "/bin/bash",
                     "run_if": "any"
@@ -198,9 +189,8 @@ def generate_e2e_cmd_test_gocd_yaml_job(fetch_artifacts_list):
             {
                 "exec": {
                     "arguments": [
-                        "-l",
                         "-c",
-                        "make bootstrap"
+                        f"{_pre_arguments} make bootstrap"
                     ],
                     "command": "/bin/bash",
                     "run_if": "passed"
@@ -209,9 +199,8 @@ def generate_e2e_cmd_test_gocd_yaml_job(fetch_artifacts_list):
             {
                 "exec": {
                     "arguments": [
-                        "-l",
                         "-c",
-                        "make cmd"
+                        f"{_pre_arguments} make cmd"
                     ],
                     "command": "/bin/bash",
                     "run_if": "passed"
