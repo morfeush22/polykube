@@ -20,6 +20,7 @@ run_gocd_client:
 		--env GO_SERVER_URL="http://$(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)/go" \
 		--env AGENT_AUTO_REGISTER_KEY="$(AGENT_AUTO_REGISTER_KEY)" \
 		--env AGENT_AUTO_REGISTER_HOSTNAME="$(GOCD_CLIENT_NAME)" \
+		--ulimit nofile=65535:65535 \
 		infra-gocd_client:latest
 
 start_gocd_client:
