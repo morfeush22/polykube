@@ -13,7 +13,7 @@ main() {
   local kubernetes_repo_root_dir="$1"
   local polyrepo_dest_root_dir="$2"
 
-  if [[ "${SKIP_WHISKY}" != true ]]; then
+  if [[ "${SKIP_WHISKY:-false}" != true ]]; then
     whisky_on_ice "${kubernetes_repo_root_dir}" "hack" "${polyrepo_dest_root_dir}"
   fi
 

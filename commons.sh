@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+set -o errexit
+set -o nounset
+set -o pipefail
+
 # shellcheck disable=SC1090
 source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/b-log.sh
 
@@ -34,7 +38,7 @@ extract_internal_dependencies_from_go_package_deps() {
   local -n kub_package_absolute_path_array="$3"
 
   local kub_packages
-  kub_packages="$(grep '\.' "${go_package_deps_file_path}")"
+  kub_packages="$(grep '\.' "${go_package_deps_file_path}")" || :
 
   readarray -t kub_package_array <<<"${kub_packages}"
 
@@ -64,10 +68,10 @@ copy_dependent_packages_to_destination() {
     mkdir -p "${destination_absolute_path}"
 
     local cp_output
-    cp_output="$(cp "${kub_package}"/* "${destination_absolute_path}" 2>&1)"
+    cp_output="$(cp "${kub_package}"/* "${destination_absolute_path}" 2>&1)" || :
 
     local non_omit_directory_errors
-    non_omit_directory_errors="$(echo "${cp_output}" | grep -v 'omitting directory')"
+    non_omit_directory_errors="$(echo "${cp_output}" | grep -v 'omitting directory')" || :
 
     if [[ -n "${non_omit_directory_errors}" ]]; then
       FATAL "${cp_output}"
@@ -181,7 +185,7 @@ generate_go_package_deps_file() {
 
   pushd "${component_absolute_path}" || return
 
-  go list -test -f '{{ join .Deps "\n" }}' >"${temp_file_path}"
+  go list -test -f '{{ join .Deps "\n" }}' >"${temp_file_path}" || :
 
   popd || return
 }
