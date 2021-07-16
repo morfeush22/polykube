@@ -9,6 +9,12 @@
     <config-repos>
         <config-repo id="polyrepo" pluginId="yaml.config.plugin">
             <git url="http://{{ getenv "GIT_SERVER_LISTEN_HOST" }}:{{ getenv "GIT_SERVER_LISTEN_PORT" }}/{{ getenv "POLYREPO_GITS_RELATIVE_DIR" }}/{{ getenv "POLYREPO_GOCD_YAMLS_RELATIVE_DIR" }}.git" />
+			<configuration>
+				<property>
+					<key>file_pattern</key>
+					<value>*.yaml</value>
+				</property>
+			</configuration>
             <rules>
                 <allow action="refer" type="*">*</allow>
             </rules>

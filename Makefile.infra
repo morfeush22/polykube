@@ -12,7 +12,7 @@ run_agent:
 		-i \
 		-t \
 		--rm \
-		infra-client /bin/bash
+		infra-gocd_client:latest /bin/bash
 
 pause_all_pipelines:
 	./pause-all-pipelines.sh $(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)
@@ -27,7 +27,7 @@ run_gocd_server:
 		--network=host \
 		--name $(GOCD_SERVER_NAME) \
 		--env-file $(GOCD_SERVER_ENV_FILE_PATH) \
-		infra-server
+		infra-gocd_server:latest
 
 start_gocd_server:
 	docker start $(GOCD_SERVER_NAME)
@@ -35,8 +35,7 @@ start_gocd_server:
 stop_gocd_server:
 	docker stop $(GOCD_SERVER_NAME)
 
-delete_gocd_server:
-	docker stop $(GOCD_SERVER_NAME)
+delete_gocd_server: stop_gocd_server
 	docker rm $(GOCD_SERVER_NAME)
 
 run_git_server:
@@ -54,8 +53,7 @@ start_git_server:
 stop_git_server:
 	docker stop $(GIT_SERVER_NAME)
 
-delete_git_server:
-	docker stop $(GIT_SERVER_NAME)
+delete_git_server: stop_git_server
 	docker rm $(GIT_SERVER_NAME)
 
 run_server_infra: run_gocd_server run_git_server
