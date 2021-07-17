@@ -39,7 +39,7 @@ main() {
       -H 'Content-Type: application/json' \
       -H 'X-GoCD-Confirm: true' \
       -X POST \
-      "${pipeline_unpause_url}"
+      "${pipeline_unpause_url}" || :
   done
 }
 

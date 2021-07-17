@@ -23,6 +23,8 @@ tests: {{ join (keys $test_targets_escaped) " " }}
 export MAKEFILE_ETCD_HOST := 127.0.0.1
 export MAKEFILE_ETCD_PORT := 2379
 
+ETCD_PID_FILE := ./etcd.pid
+
 setup:
 	$(eval export MAKEFILE_ETCD_DATA_DIR := $(shell mktemp -d))
 	$(eval export MAKEFILE_ETCD_LOG_DIR  := $(shell mktemp))
@@ -31,10 +33,11 @@ setup:
 		--advertise-client-urls http://$(MAKEFILE_ETCD_HOST):$(MAKEFILE_ETCD_PORT) \
 		--data-dir "$(MAKEFILE_ETCD_DATA_DIR)" \
 		--listen-client-urls http://$(MAKEFILE_ETCD_HOST):$(MAKEFILE_ETCD_PORT) \
-		--log-level=debug 2>"$(MAKEFILE_ETCD_LOG_DIR)" >/dev/null &
+		--log-level=debug 2>"$(MAKEFILE_ETCD_LOG_DIR)" >/dev/null & echo $! > $(ETCD_PID_FILE)
 
 	# hacky, wait for etcd to up
 	sleep 20
+	ps -p "$$(cat $(ETCD_PID_FILE))"
 
 teardown:
-	fuser -k 2379/tcp
+	fuser -k $(MAKEFILE_ETCD_PORT)/tcp

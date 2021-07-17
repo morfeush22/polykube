@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y \
       gnupg \
       jq \
       make \
+      psmisc \
  && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSL https://github.com/coreos/etcd/releases/download/$ETCD_VERSION/etcd-$ETCD_VERSION-linux-amd64.tar.gz \
@@ -49,6 +50,8 @@ RUN curl -fsSL https://golang.org/dl/$GO_VERSION.linux-amd64.tar.gz \
 
 ENV PATH="/usr/local/go/bin:$PATH"
 
+USER go
+
 RUN GO111MODULE="on" go get sigs.k8s.io/kind@$KIND_VERSION
 
-USER go
+ENV PATH="/home/go/go/bin:$PATH"

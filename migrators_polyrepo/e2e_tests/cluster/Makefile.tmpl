@@ -1,7 +1,7 @@
 # hack for scripts
 all quick-release-images:
 
-export KUBECONFIG := ${HOME}/.kube/kind-test-config
+export KUBECONFIG := $(HOME)/.kube/kind-test-config
 
 cluster:
 	go test -c ./test/e2e_kubeadm

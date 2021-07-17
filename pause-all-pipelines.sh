@@ -41,7 +41,7 @@ main() {
       -d '{
             "pause_cause": "pause"
           }' \
-      "${pipeline_pause_url}"
+      "${pipeline_pause_url}" || :
   done
 }
 
