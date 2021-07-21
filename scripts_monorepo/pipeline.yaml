@@ -1,0 +1,124 @@
+format_version: 10
+pipelines:
+  monorepo_pipeline:
+    display_order: -1
+    environment_variables:
+      MATERIAL_NAME: monorepo_pipeline
+    group: MONOREPO
+    label_template: ${COUNT}
+    lock_behavior: none
+    materials:
+      monorepo_material:
+        auto_update: true
+        branch: master
+        git: http://localhost:8082/monorepo/kubernetes.git
+        shallow_clone: false
+    stages:
+      - build:
+          approval:
+            allow_only_on_success: false
+            type: success
+          clean_workspace: true
+          fetch_materials: true
+          jobs:
+            all:
+              artifacts: []
+              tasks:
+                - exec:
+                    arguments:
+                      - -c
+                      - set -a; eval `go env`; set +a; ./build.sh
+                    command: /bin/bash
+                    run_if: passed
+              timeout: 0
+          keep_artifacts: false
+      - test:
+          approval:
+            allow_only_on_success: false
+            type: success
+          clean_workspace: true
+          fetch_materials: true
+          jobs:
+            all:
+              artifacts: []
+              tasks:
+                - exec:
+                    arguments:
+                      - -c
+                      - set -a; eval `go env`; set +a; ./test.sh
+                    command: /bin/bash
+                    run_if: passed
+              timeout: 0
+          keep_artifacts: false
+      - integration:
+          approval:
+            allow_only_on_success: false
+            type: success
+          clean_workspace: true
+          fetch_materials: true
+          jobs:
+            all:
+              artifacts: []
+              tasks:
+                - exec:
+                    arguments:
+                      - -c
+                      - set -a; eval `go env`; set +a; ./integration.sh
+                    command: /bin/bash
+                    run_if: passed
+              timeout: 0
+          keep_artifacts: false
+      - e2e_cmd:
+          approval:
+            allow_only_on_success: false
+            type: success
+          clean_workspace: true
+          fetch_materials: true
+          jobs:
+            all:
+              artifacts: []
+              tasks:
+                - exec:
+                    arguments:
+                      - -c
+                      - set -a; eval `go env`; set +a; ./e2e_cmd.sh
+                    command: /bin/bash
+                    run_if: passed
+              timeout: 0
+          keep_artifacts: false
+      - e2e_cluster:
+          approval:
+            allow_only_on_success: false
+            type: success
+          clean_workspace: true
+          fetch_materials: true
+          jobs:
+            all:
+              artifacts: []
+              tasks:
+                - exec:
+                    arguments:
+                      - -c
+                      - set -a; eval `go env`; set +a; make bootstrap
+                    command: /bin/bash
+                    run_if: passed
+                - exec:
+                    arguments:
+                      - -c
+                      - set -a; eval `go env`; set +a; make setup
+                    command: /bin/bash
+                    run_if: passed
+                - exec:
+                    arguments:
+                      - -c
+                      - set -a; eval `go env`; set +a; make cluster
+                    command: /bin/bash
+                    run_if: passed
+                - exec:
+                    arguments:
+                      - -c
+                      - set -a; eval `go env`; set +a; make teardown
+                    command: /bin/bash
+                    run_if: any
+              timeout: 0
+          keep_artifacts: false
