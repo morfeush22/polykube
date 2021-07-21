@@ -222,7 +222,7 @@ def generate_gocd_yaml_stage(jobs):
     return {
         "fetch_materials": True,
         "keep_artifacts": False,
-        "clean_workspace": False,
+        "clean_workspace": True,
         "approval": {
             "type": "success",
             "allow_only_on_success": False
