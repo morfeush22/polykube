@@ -27,6 +27,8 @@ _build_image_gocd_server: export GIT_SERVER_LISTEN_HOST := $(GIT_SERVER_LISTEN_H
 _build_image_gocd_server: export GIT_SERVER_LISTEN_PORT := $(GIT_SERVER_LISTEN_PORT)
 _build_image_gocd_server: export POLYREPO_GITS_RELATIVE_DIR := $(POLYREPO_GITS_RELATIVE_DIR)
 _build_image_gocd_server: export POLYREPO_GOCD_YAMLS_RELATIVE_DIR := $(POLYREPO_GOCD_YAMLS_RELATIVE_DIR)
+_build_image_gocd_server: export MONOREPO_GITS_RELATIVE_DIR := $(MONOREPO_GITS_RELATIVE_DIR)
+_build_image_gocd_server: export MONOREPO_GOCD_YAMLS_RELATIVE_DIR := $(MONOREPO_GOCD_YAMLS_RELATIVE_DIR)
 _build_image_gocd_server:
 	gomplate -f $(DOCKER_IMAGES_DIR)/cruise-config.xml.tmpl -o $(DOCKER_IMAGES_DIR)/cruise-config.xml
 	cd $(DOCKER_IMAGES_DIR) && \
