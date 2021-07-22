@@ -3,34 +3,45 @@ GOCD_SERVER_NAME          := gocd_server
 GOCD_SERVER_ENV_FILE_PATH := ./gocd_server.env
 GIT_SERVER_NAME           := git_server
 
+NUM_GOCD_CLIENTS ?= 2
+
 pause_all_pipelines:
 	./pause-all-pipelines.sh $(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)
 
 unpause_all_pipelines:
 	./unpause-all-pipelines.sh $(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)
 
-run_gocd_client:
-	docker run \
-		--detach \
-		--tty \
-		--network=host \
-		--name $(GOCD_CLIENT_NAME) \
-		--group-add "$$(getent group docker | cut -d: -f3)" \
-		--volume /var/run/docker.sock:/var/run/docker.sock \
-		--env GO_SERVER_URL="http://$(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)/go" \
-		--env AGENT_AUTO_REGISTER_KEY="$(AGENT_AUTO_REGISTER_KEY)" \
-		--env AGENT_AUTO_REGISTER_HOSTNAME="$(GOCD_CLIENT_NAME)" \
-		--ulimit nofile=65535:65535 \
-		infra-gocd_client:latest
+run_gocd_clients:
+	for i in $$(seq 1 $(NUM_GOCD_CLIENTS)); do \
+		docker run \
+			--detach \
+			--tty \
+			--network=host \
+			--name $(GOCD_CLIENT_NAME)-$${i} \
+			--group-add "$$(getent group docker | cut -d: -f3)" \
+			--volume /var/run/docker.sock:/var/run/docker.sock \
+			--env GO_SERVER_URL="http://$(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)/go" \
+			--env AGENT_AUTO_REGISTER_KEY="$(AGENT_AUTO_REGISTER_KEY)" \
+			--env AGENT_AUTO_REGISTER_HOSTNAME="$(GOCD_CLIENT_NAME)" \
+			--ulimit nofile=65535:65535 \
+			infra-gocd_client:latest; \
+	done
 
-start_gocd_client:
-	docker start $(GOCD_CLIENT_NAME)
+start_gocd_clients:
+	for i in $$(seq 1 $(NUM_GOCD_CLIENTS)); do \
+		docker start $(GOCD_CLIENT_NAME)-$${i}; \
+	done
 
-stop_gocd_client:
-	docker stop $(GOCD_CLIENT_NAME)
 
-delete_gocd_client: stop_gocd_client
-	docker rm $(GOCD_CLIENT_NAME)
+stop_gocd_clients:
+	for i in $$(seq 1 $(NUM_GOCD_CLIENTS)); do \
+		docker stop $(GOCD_CLIENT_NAME)-$${i}; \
+	done
+
+delete_gocd_clients: stop_gocd_clients
+	for i in $$(seq 1 $(NUM_GOCD_CLIENTS)); do \
+		docker rm $(GOCD_CLIENT_NAME)-$${i}; \
+	done
 
 run_gocd_server:
 	docker run \
