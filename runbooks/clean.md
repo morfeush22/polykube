@@ -1,0 +1,8 @@
+make clean_polyrepo
+make clean_monorepo
+
+make clean_polyrepo_gits
+make clean_monorepo_gits
+
+make delete_gocd_clients
+make delete_server_infra
