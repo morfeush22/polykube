@@ -11,11 +11,11 @@ source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/b-log.sh
 LOG_LEVEL_WARN
 
 main() {
-  local polyrepo_git_source_dir="$1"
-  local polyrepo_git_dest_dir="$2"
+  local git_source_dir="$1"
+  local git_dest_dir="$2"
 
-  if [[ ! -d "${polyrepo_git_source_dir}/.git" ]]; then
-    pushd "${polyrepo_git_source_dir}" || return
+  if [[ ! -d "${git_source_dir}/.git" ]]; then
+    pushd "${git_source_dir}" || return
 
     git init
     git add -A
@@ -24,7 +24,7 @@ main() {
     popd || return
   fi
 
-  git clone --bare "${polyrepo_git_source_dir}" "${polyrepo_git_dest_dir}"
+  git clone --bare "${git_source_dir}" "${git_dest_dir}"
 }
 
 main "$@"

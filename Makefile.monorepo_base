@@ -1,0 +1,27 @@
+MONOREPO_DEST_ROOT_DIR := $(HOME)/Projects/masters/monorepo
+
+MONOREPO_KUBERNETES_RELATIVE_DIR  := kubernetes
+MONOREPO_KUBERNETES_DEST_ROOT_DIR := $(MONOREPO_DEST_ROOT_DIR)/$(MONOREPO_KUBERNETES_RELATIVE_DIR)
+
+migrate_all_to_monorepo:
+	mkdir -p $(MONOREPO_KUBERNETES_DEST_ROOT_DIR)
+
+	cp -r $(KUBERNETES_REPO_ROOT_DIR)/* $(MONOREPO_KUBERNETES_DEST_ROOT_DIR)
+
+	cp ./scripts_monorepo/build.sh $(MONOREPO_KUBERNETES_DEST_ROOT_DIR)
+	cp ./scripts_monorepo/e2e_cmd.sh $(MONOREPO_KUBERNETES_DEST_ROOT_DIR)
+	cp ./scripts_monorepo/integration.sh $(MONOREPO_KUBERNETES_DEST_ROOT_DIR)
+	cp ./scripts_monorepo/kind-config.yaml $(MONOREPO_KUBERNETES_DEST_ROOT_DIR)
+	cp ./scripts_monorepo/Makefile.e2e_cluster $(MONOREPO_KUBERNETES_DEST_ROOT_DIR)/Makefile
+	cp ./scripts_monorepo/test.sh $(MONOREPO_KUBERNETES_DEST_ROOT_DIR)
+
+clean_monorepo:
+	rm -rf $(MONOREPO_DEST_ROOT_DIR)
+
+MONOREPO_GOCD_YAMLS_RELATIVE_DIR  := gocd_yamls
+MONOREPO_GOCD_YAMLS_DEST_ROOT_DIR := $(MONOREPO_DEST_ROOT_DIR)/$(MONOREPO_GOCD_YAMLS_RELATIVE_DIR)
+
+create_monorepo_gocd_yamls_subdir:
+	mkdir -p $(MONOREPO_GOCD_YAMLS_DEST_ROOT_DIR)
+
+	cp ./scripts_monorepo/pipeline.yaml $(MONOREPO_GOCD_YAMLS_DEST_ROOT_DIR)

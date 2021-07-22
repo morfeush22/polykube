@@ -33,7 +33,7 @@ _polyrepo_binary_component_%:
 	rm -rf $(POLYREPO_BINARY_COMPONENTS_REPO_DEST_ROOT_DIR)/$(*).git
 	mkdir -p $(POLYREPO_BINARY_COMPONENTS_REPO_DEST_ROOT_DIR)/$(*).git
 
-	./polyrepo-git-bootstrap.sh \
+	./git-bootstrap.sh \
 		$(POLYREPO_BINARY_COMPONENTS_DEST_ROOT_DIR)/$(*) \
 		$(POLYREPO_BINARY_COMPONENTS_REPO_DEST_ROOT_DIR)/$(*).git
 
@@ -41,7 +41,7 @@ _polyrepo_integration_test_%:
 	rm -rf $(POLYREPO_INTEGRATION_TESTS_REPO_DEST_ROOT_DIR)/$(*).git
 	mkdir -p $(POLYREPO_INTEGRATION_TESTS_REPO_DEST_ROOT_DIR)/$(*).git
 
-	./polyrepo-git-bootstrap.sh \
+	./git-bootstrap.sh \
 		$(POLYREPO_INTEGRATION_TESTS_DEST_ROOT_DIR)/$(*) \
 		$(POLYREPO_INTEGRATION_TESTS_REPO_DEST_ROOT_DIR)/$(*).git
 
@@ -49,7 +49,7 @@ _polyrepo_api_%:
 	rm -rf $(POLYREPO_APIS_REPO_DEST_ROOT_DIR)/$(*).git
 	mkdir -p $(POLYREPO_APIS_REPO_DEST_ROOT_DIR)/$(*).git
 
-	./polyrepo-git-bootstrap.sh \
+	./git-bootstrap.sh \
 		$(POLYREPO_APIS_DEST_ROOT_DIR)/$(*) \
 		$(POLYREPO_APIS_REPO_DEST_ROOT_DIR)/$(*).git
 
@@ -57,7 +57,7 @@ _polyrepo_plugin_%:
 	rm -rf $(POLYREPO_PLUGINS_REPO_DEST_ROOT_DIR)/$(*).git
 	mkdir -p $(POLYREPO_PLUGINS_REPO_DEST_ROOT_DIR)/$(*).git
 
-	./polyrepo-git-bootstrap.sh \
+	./git-bootstrap.sh \
 		$(POLYREPO_PLUGINS_DEST_ROOT_DIR)/$(*) \
 		$(POLYREPO_PLUGINS_REPO_DEST_ROOT_DIR)/$(*).git
 
@@ -65,7 +65,7 @@ _polyrepo_staging_%:
 	rm -rf $(POLYREPO_STAGING_REPO_DEST_ROOT_DIR)/$(*).git
 	mkdir -p $(POLYREPO_STAGING_REPO_DEST_ROOT_DIR)/$(*).git
 
-	./polyrepo-git-bootstrap.sh \
+	./git-bootstrap.sh \
 		$(POLYREPO_STAGING_DEST_ROOT_DIR)/$(*) \
 		$(POLYREPO_STAGING_REPO_DEST_ROOT_DIR)/$(*).git
 
@@ -73,7 +73,7 @@ _polyrepo_e2e_test_%:
 	rm -rf $(POLYREPO_E2E_TESTS_REPO_DEST_ROOT_DIR)/$(*).git
 	mkdir -p $(POLYREPO_E2E_TESTS_REPO_DEST_ROOT_DIR)/$(*).git
 
-	./polyrepo-git-bootstrap.sh \
+	./git-bootstrap.sh \
 		$(POLYREPO_E2E_TESTS_DEST_ROOT_DIR)/$(*) \
 		$(POLYREPO_E2E_TESTS_REPO_DEST_ROOT_DIR)/$(*).git
 
@@ -81,7 +81,7 @@ _polyrepo_gocd_yamls:
 	rm -rf $(POLYREPO_GOCD_YAMLS_REPO_DEST_ROOT_DIR).git
 	mkdir -p $(POLYREPO_GOCD_YAMLS_REPO_DEST_ROOT_DIR).git
 
-	./polyrepo-git-bootstrap.sh \
+	./git-bootstrap.sh \
 		$(POLYREPO_GOCD_YAMLS_DEST_ROOT_DIR) \
 		$(POLYREPO_GOCD_YAMLS_REPO_DEST_ROOT_DIR).git
 

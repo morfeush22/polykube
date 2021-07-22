@@ -1,0 +1,3 @@
+make migrate_all_to_monorepo
+make construct_monorepo_gocd_yaml_files
+make giterize_all_monorepos_git_repos
