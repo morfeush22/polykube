@@ -19,7 +19,7 @@
                 <allow action="refer" type="*">*</allow>
             </rules>
         </config-repo>
-        <config-repo id="polyrepo" pluginId="yaml.config.plugin">
+        <config-repo id="monorepo" pluginId="yaml.config.plugin">
             <git url="http://{{ getenv "GIT_SERVER_LISTEN_HOST" }}:{{ getenv "GIT_SERVER_LISTEN_PORT" }}/{{ getenv "MONOREPO_GITS_RELATIVE_DIR" }}/{{ getenv "MONOREPO_GOCD_YAMLS_RELATIVE_DIR" }}.git" />
 			<configuration>
 				<property>
