@@ -15,6 +15,7 @@ pause_all_pipelines:
 unpause_all_pipelines:
 	./unpause-all-pipelines.sh $(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)
 
+run_gocd_clients_common: RUN_GOCD_CLIENTS_COMMON_GOCD_SERVER_LISTEN_HOST ?= $(GOCD_SERVER_LISTEN_HOST)
 run_gocd_clients_common:
 	for i in $$(seq 1 $(NUM_GOCD_CLIENTS_COMMON)); do \
 		docker run \
@@ -24,9 +25,10 @@ run_gocd_clients_common:
 			--name $(GOCD_CLIENT_NAME)-common-$${i} \
 			--group-add "$$(getent group docker | cut -d: -f3)" \
 			--volume /var/run/docker.sock:/var/run/docker.sock \
-			--env GO_SERVER_URL="http://$(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)/go" \
+			--env GO_SERVER_URL="http://$(RUN_GOCD_CLIENTS_COMMON_GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)/go" \
 			--env AGENT_AUTO_REGISTER_KEY="$(AGENT_AUTO_REGISTER_KEY)" \
-			--env AGENT_AUTO_REGISTER_HOSTNAME="$(GOCD_CLIENT_NAME)-common-$${i}" \
+			--env AGENT_AUTO_REGISTER_HOSTNAME="$(GOCD_CLIENT_NAME)-common-$$(hostname)-$${i}" \
+			--env AGENT_AUTO_REGISTER_ENVIRONMENTS="common" \
 			--ulimit nofile=65535:65535 \
 			infra-gocd_client:latest; \
 	done
@@ -47,6 +49,7 @@ delete_gocd_clients_common: stop_gocd_clients_common
 		docker rm $(GOCD_CLIENT_NAME)-common-$${i}; \
 	done
 
+run_gocd_clients_e2e_cluster: RUN_GOCD_CLIENTS_E2E_CLUSTER_GOCD_SERVER_LISTEN_HOST ?= $(GOCD_SERVER_LISTEN_HOST)
 run_gocd_clients_e2e_cluster:
 	for i in $$(seq 1 $(NUM_GOCD_CLIENTS_E2E_CLUSTER)); do \
 		docker run \
@@ -57,9 +60,10 @@ run_gocd_clients_e2e_cluster:
 			--name $(GOCD_CLIENT_NAME)-e2e-cluster-$${i} \
 			--group-add "$$(getent group docker | cut -d: -f3)" \
 			--volume /var/run/docker.sock:/var/run/docker.sock \
-			--env GO_SERVER_URL="http://$(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)/go" \
+			--env GO_SERVER_URL="http://$(RUN_GOCD_CLIENTS_E2E_CLUSTER_GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)/go" \
 			--env AGENT_AUTO_REGISTER_KEY="$(AGENT_AUTO_REGISTER_KEY)" \
-			--env AGENT_AUTO_REGISTER_HOSTNAME="$(GOCD_CLIENT_NAME)-e2e-cluster-$${i}" \
+			--env AGENT_AUTO_REGISTER_HOSTNAME="$(GOCD_CLIENT_NAME)-e2e-cluster-$$(hostname)-$${i}" \
+			--env AGENT_AUTO_REGISTER_ENVIRONMENTS="e2e_cluster" \
 			--ulimit nofile=65535:65535 \
 			infra-gocd_client:latest; \
 	done

@@ -33,7 +33,7 @@ setup:
 		--advertise-client-urls http://$(MAKEFILE_ETCD_HOST):$(MAKEFILE_ETCD_PORT) \
 		--data-dir "$(MAKEFILE_ETCD_DATA_DIR)" \
 		--listen-client-urls http://$(MAKEFILE_ETCD_HOST):$(MAKEFILE_ETCD_PORT) \
-		--log-level=debug 2>"$(MAKEFILE_ETCD_LOG_DIR)" >/dev/null
+		--log-level=debug 2>"$(MAKEFILE_ETCD_LOG_DIR)" >/dev/null 2>&1 &
 
 	# hacky, wait for etcd to up
 	sleep 20
