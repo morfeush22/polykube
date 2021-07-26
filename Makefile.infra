@@ -6,7 +6,7 @@ GOCD_POSTGRESQL_NAME      := gocd_postgresql
 
 GOCD_POSTGRESQL_PASSWORD := postgres
 
-NUM_GOCD_CLIENTS ?= 2
+NUM_GOCD_CLIENTS ?= 1
 
 pause_all_pipelines:
 	./pause-all-pipelines.sh $(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)
@@ -25,7 +25,7 @@ run_gocd_clients:
 			--volume /var/run/docker.sock:/var/run/docker.sock \
 			--env GO_SERVER_URL="http://$(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)/go" \
 			--env AGENT_AUTO_REGISTER_KEY="$(AGENT_AUTO_REGISTER_KEY)" \
-			--env AGENT_AUTO_REGISTER_HOSTNAME="$(GOCD_CLIENT_NAME)" \
+			--env AGENT_AUTO_REGISTER_HOSTNAME="$(GOCD_CLIENT_NAME)-$${i}" \
 			--ulimit nofile=65535:65535 \
 			infra-gocd_client:latest; \
 	done
