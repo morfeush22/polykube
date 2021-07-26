@@ -33,11 +33,11 @@ setup:
 		--advertise-client-urls http://$(MAKEFILE_ETCD_HOST):$(MAKEFILE_ETCD_PORT) \
 		--data-dir "$(MAKEFILE_ETCD_DATA_DIR)" \
 		--listen-client-urls http://$(MAKEFILE_ETCD_HOST):$(MAKEFILE_ETCD_PORT) \
-		--log-level=debug 2>"$(MAKEFILE_ETCD_LOG_DIR)" >/dev/null & echo $! > $(ETCD_PID_FILE)
+		--log-level=debug 2>"$(MAKEFILE_ETCD_LOG_DIR)" >/dev/null
 
 	# hacky, wait for etcd to up
 	sleep 20
-	ps -p "$$(cat $(ETCD_PID_FILE))"
+	ps -p $$(fuser $(MAKEFILE_ETCD_PORT)/tcp 2>/dev/null)
 
 teardown:
 	fuser -k $(MAKEFILE_ETCD_PORT)/tcp

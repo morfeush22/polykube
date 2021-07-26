@@ -192,7 +192,7 @@ def generate_gocd_yaml_e2e_tests_files(e2e_cluster_test_node_triggers, e2e_cmd_t
         e2e_cmd_test_fetch_artifacts_list.append({
             "pipeline": node_trigger_pipeline_name,
             "source": binary_artifact_name,
-            "destination": f"{artifacts_dir_name}/{binary_artifact_name}",
+            "destination": f"{artifacts_dir_name}",
         })
 
     group = f"POLYREPO_E2E"

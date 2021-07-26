@@ -1,6 +1,9 @@
 _all = "all"
 _pre_arguments = "set -a; eval `go env`; set +a;"
 
+_common_env_name = "common"
+_e2e_cluster_env_name = "e2e_cluster"
+
 artifacts_dir_name = "_artifacts"
 
 e2e_cluster_pipeline_name = "e2e_cluster"
@@ -260,10 +263,19 @@ def generate_gocd_yaml_pipeline(group, materials, stages, environment_variables)
     }
 
 
-def generate_gocd_yaml(pipelines):
+def generate_gocd_yaml_environment(pipeline):
+    return {
+        "pipelines": [
+            pipeline
+        ]
+    }
+
+
+def generate_gocd_yaml(pipelines, environments):
     return {
         "format_version": 10,
-        "pipelines": pipelines
+        "pipelines": pipelines,
+        "environments": environments
     }
 
 
@@ -303,6 +315,9 @@ def generate_binary_component_yaml_file(node_pipeline_name, node_pipeline_trigge
                     "MATERIAL_NAME": node_material_name
                 }
             )
+        },
+        environments={
+            _common_env_name: generate_gocd_yaml_environment(node_pipeline_name)
         }
     )
 
@@ -338,6 +353,9 @@ def generate_integration_test_yaml_file(node_pipeline_name, node_pipeline_trigge
                 }
 
             )
+        },
+        environments={
+            _common_env_name: generate_gocd_yaml_environment(node_pipeline_name)
         }
     )
 
@@ -372,6 +390,9 @@ def generate_api_yaml_file(node_pipeline_name, node_pipeline_triggers_list, grou
                     "MATERIAL_NAME": node_material_name
                 }
             )
+        },
+        environments={
+            _common_env_name: generate_gocd_yaml_environment(node_pipeline_name)
         }
     )
 
@@ -406,6 +427,9 @@ def generate_plugin_yaml_file(node_pipeline_name, node_pipeline_triggers_list, g
                     "MATERIAL_NAME": node_material_name
                 }
             )
+        },
+        environments={
+            _common_env_name: generate_gocd_yaml_environment(node_pipeline_name)
         }
     )
 
@@ -440,6 +464,9 @@ def generate_staging_yaml_file(node_pipeline_name, node_pipeline_triggers_list, 
                     "MATERIAL_NAME": node_material_name
                 }
             )
+        },
+        environments={
+            _common_env_name: generate_gocd_yaml_environment(node_pipeline_name)
         }
     )
 
@@ -478,6 +505,9 @@ def generate_e2e_test_cluster_yaml_file(node_pipeline_triggers_list, group, node
                 }
 
             )
+        },
+        environments={
+            _e2e_cluster_env_name: generate_gocd_yaml_environment(e2e_cluster_pipeline_name)
         }
     )
 
@@ -516,5 +546,8 @@ def generate_e2e_test_cmd_yaml_file(node_pipeline_triggers_list, group, node_git
                 }
 
             )
+        },
+        environments={
+            _common_env_name: generate_gocd_yaml_environment(e2e_cmd_pipeline_name)
         }
     )

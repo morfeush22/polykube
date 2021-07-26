@@ -6,7 +6,8 @@ GOCD_POSTGRESQL_NAME      := gocd_postgresql
 
 GOCD_POSTGRESQL_PASSWORD := postgres
 
-NUM_GOCD_CLIENTS ?= 1
+NUM_GOCD_CLIENTS_COMMON      ?= 1
+NUM_GOCD_CLIENTS_E2E_CLUSTER ?= 1
 
 pause_all_pipelines:
 	./pause-all-pipelines.sh $(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)
@@ -14,37 +15,75 @@ pause_all_pipelines:
 unpause_all_pipelines:
 	./unpause-all-pipelines.sh $(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)
 
-run_gocd_clients:
-	for i in $$(seq 1 $(NUM_GOCD_CLIENTS)); do \
+run_gocd_clients_common:
+	for i in $$(seq 1 $(NUM_GOCD_CLIENTS_COMMON)); do \
 		docker run \
 			--detach \
 			--tty \
-			--network=host \
-			--name $(GOCD_CLIENT_NAME)-$${i} \
+			--privileged \
+			--name $(GOCD_CLIENT_NAME)-common-$${i} \
 			--group-add "$$(getent group docker | cut -d: -f3)" \
 			--volume /var/run/docker.sock:/var/run/docker.sock \
 			--env GO_SERVER_URL="http://$(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)/go" \
 			--env AGENT_AUTO_REGISTER_KEY="$(AGENT_AUTO_REGISTER_KEY)" \
-			--env AGENT_AUTO_REGISTER_HOSTNAME="$(GOCD_CLIENT_NAME)-$${i}" \
+			--env AGENT_AUTO_REGISTER_HOSTNAME="$(GOCD_CLIENT_NAME)-common-$${i}" \
 			--ulimit nofile=65535:65535 \
 			infra-gocd_client:latest; \
 	done
 
-start_gocd_clients:
-	for i in $$(seq 1 $(NUM_GOCD_CLIENTS)); do \
-		docker start $(GOCD_CLIENT_NAME)-$${i}; \
+start_gocd_clients_common:
+	for i in $$(seq 1 $(NUM_GOCD_CLIENTS_COMMON)); do \
+		docker start $(GOCD_CLIENT_NAME)-common-$${i}; \
 	done
 
 
-stop_gocd_clients:
-	for i in $$(seq 1 $(NUM_GOCD_CLIENTS)); do \
-		docker stop $(GOCD_CLIENT_NAME)-$${i}; \
+stop_gocd_clients_common:
+	for i in $$(seq 1 $(NUM_GOCD_CLIENTS_COMMON)); do \
+		docker stop $(GOCD_CLIENT_NAME)-common-$${i}; \
 	done
 
-delete_gocd_clients: stop_gocd_clients
-	for i in $$(seq 1 $(NUM_GOCD_CLIENTS)); do \
-		docker rm $(GOCD_CLIENT_NAME)-$${i}; \
+delete_gocd_clients_common: stop_gocd_clients_common
+	for i in $$(seq 1 $(NUM_GOCD_CLIENTS_COMMON)); do \
+		docker rm $(GOCD_CLIENT_NAME)-common-$${i}; \
 	done
+
+run_gocd_clients_e2e_cluster:
+	for i in $$(seq 1 $(NUM_GOCD_CLIENTS_E2E_CLUSTER)); do \
+		docker run \
+			--detach \
+			--tty \
+			--privileged \
+			--network=host \
+			--name $(GOCD_CLIENT_NAME)-e2e-cluster-$${i} \
+			--group-add "$$(getent group docker | cut -d: -f3)" \
+			--volume /var/run/docker.sock:/var/run/docker.sock \
+			--env GO_SERVER_URL="http://$(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)/go" \
+			--env AGENT_AUTO_REGISTER_KEY="$(AGENT_AUTO_REGISTER_KEY)" \
+			--env AGENT_AUTO_REGISTER_HOSTNAME="$(GOCD_CLIENT_NAME)-e2e-cluster-$${i}" \
+			--ulimit nofile=65535:65535 \
+			infra-gocd_client:latest; \
+	done
+
+start_gocd_clients_e2e_cluster:
+	for i in $$(seq 1 $(NUM_GOCD_CLIENTS_E2E_CLUSTER)); do \
+		docker start $(GOCD_CLIENT_NAME)-e2e-cluster-$${i}; \
+	done
+
+
+stop_gocd_clients_e2e_cluster:
+	for i in $$(seq 1 $(NUM_GOCD_CLIENTS_E2E_CLUSTER)); do \
+		docker stop $(GOCD_CLIENT_NAME)-e2e-cluster-$${i}; \
+	done
+
+delete_gocd_clients_e2e_cluster: stop_gocd_clients_e2e_cluster
+	for i in $$(seq 1 $(NUM_GOCD_CLIENTS_E2E_CLUSTER)); do \
+		docker rm $(GOCD_CLIENT_NAME)-e2e-cluster-$${i}; \
+	done
+
+run_gocd_clients: run_gocd_clients_common run_gocd_clients_e2e_cluster
+start_gocd_clients: start_gocd_clients_common start_gocd_clients_e2e_cluster
+stop_gocd_clients: stop_gocd_clients_common stop_gocd_clients_e2e_cluster
+delete_gocd_clients: delete_gocd_clients_common delete_gocd_clients_e2e_cluster
 
 run_gocd_server:
 	docker run \
