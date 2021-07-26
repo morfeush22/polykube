@@ -1,0 +1,7 @@
+FROM postgres:9.6
+
+RUN mkdir -p /docker-entrypoint-initdb.d
+
+COPY ./init-postgresql-db.sh /docker-entrypoint-initdb.d/init-postgresql-db.sh
+
+RUN chmod 755 /docker-entrypoint-initdb.d/init-postgresql-db.sh

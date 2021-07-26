@@ -2,6 +2,9 @@ GOCD_CLIENT_NAME          := gocd_client
 GOCD_SERVER_NAME          := gocd_server
 GOCD_SERVER_ENV_FILE_PATH := ./gocd_server.env
 GIT_SERVER_NAME           := git_server
+GOCD_POSTGRESQL_NAME      := gocd_postgresql
+
+GOCD_POSTGRESQL_PASSWORD := postgres
 
 NUM_GOCD_CLIENTS ?= 2
 
@@ -80,7 +83,25 @@ stop_git_server:
 delete_git_server: stop_git_server
 	docker rm $(GIT_SERVER_NAME)
 
-run_server_infra: run_gocd_server run_git_server
-start_server_infra: start_gocd_server start_git_server
-stop_server_infra: stop_gocd_server stop_git_server
-delete_server_infra: delete_gocd_server delete_git_server
+run_gocd_postgresql:
+	docker run \
+		--detach \
+		--tty \
+		--network=host \
+		--name $(GOCD_POSTGRESQL_NAME) \
+		--env POSTGRES_PASSWORD=$(GOCD_POSTGRESQL_PASSWORD) \
+		infra-gocd_postgresql:latest
+
+start_gocd_postgresql:
+	docker start $(GOCD_POSTGRESQL_NAME)
+
+stop_gocd_postgresql:
+	docker stop $(GOCD_POSTGRESQL_NAME)
+
+delete_gocd_postgresql: stop_gocd_postgresql
+	docker rm $(GOCD_POSTGRESQL_NAME)
+
+run_server_infra: run_gocd_server run_git_server run_gocd_postgresql
+start_server_infra: start_gocd_server start_git_server start_gocd_postgresql
+stop_server_infra: stop_gocd_server stop_git_server stop_gocd_postgresql
+delete_server_infra: delete_gocd_server delete_git_server delete_gocd_postgresql

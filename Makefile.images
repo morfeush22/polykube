@@ -5,7 +5,8 @@ DOCKER_IMAGES := \
 	bazel_cache \
 	git_server \
 	gocd_client \
-	gocd_server
+	gocd_server \
+	gocd_postgresql
 
 ALL_IMAGES_TARGETS := $(addprefix _build_image_,$(DOCKER_IMAGES))
 
