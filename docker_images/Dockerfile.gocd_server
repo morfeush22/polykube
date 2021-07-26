@@ -13,3 +13,5 @@ RUN mkdir -p /go-working-dir/analytics-assets \
  && curl -fsSLO https://code.highcharts.com/6.1.3/modules/no-data-to-display.src.js \
  && curl -fsSLO https://code.highcharts.com/6.1.3/modules/xrange.src.js \
  && curl -fsSLO https://code.highcharts.com/6.1.3/highcharts.src.js
+
+COPY ./wrapper-properties.conf /go-server/wrapper-config/wrapper-properties.conf
