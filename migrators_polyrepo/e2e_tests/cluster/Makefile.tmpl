@@ -1,21 +1,23 @@
 # hack for scripts
 all quick-release-images:
 
-export KUBECONFIG        := $(HOME)/.kube/kind-test-config
-export KIND_CLUSTER_NAME := $(subst _,-,kind-$(GO_PIPELINE_NAME)-$(GO_PIPELINE_COUNTER))
+export KUBECONFIG        := $(HOME)/.kube/config
+export KIND_CLUSTER_NAME := $(subst _,-,$(GO_PIPELINE_NAME)-$(GO_PIPELINE_COUNTER))
 
 cluster:
 	go test -c ./test/e2e_kubeadm
 	go test -c ./test/e2e
 
-	./e2e_kubeadm.test --context $(KIND_CLUSTER_NAME) --num-nodes 2 --ginkgo.skip="\[copy-certs\]"
-	./e2e.test --kubectl-path ./kubectl --context $(KIND_CLUSTER_NAME) --num-nodes 2 --ginkgo.focus="\[Conformance\]"
+	./e2e_kubeadm.test --context kind-$(KIND_CLUSTER_NAME) --num-nodes 2 --ginkgo.skip="\[copy-certs\]"
+	./e2e.test --kubectl-path ./kubectl --context kind-$(KIND_CLUSTER_NAME) --num-nodes 2 --ginkgo.focus="\[Conformance\]"
 
 bootstrap:
 	{{ getenv "BOOTSTRAP_SCRIPT_RELATIVE_PATH" }}
 
 # kind
 setup:
+	rm -f $(KUBECONFIG)
+
 	kind create cluster \
 		--config {{ getenv "KIND_CONFIG_RELATIVE_PATH" }} \
 		--image kindest/node:latest \
