@@ -25,12 +25,12 @@ main() {
   pushd "${kubernetes_repo_root_dir}" || return
 
   local kube_git_version
-  kube_git_version="$(./hack/print-workspace-status.sh | sed -n 's/^gitVersion \(.*\)$/\1/p')"
+  kube_git_version="$(./hack/print-workspace-status.sh | sed -n 's/^gitVersion \(.*\)-.*$/\1/p')"
 
   popd || return
 
   # kind needs kube git version
-  echo "export KUBE_GIT_VERSION=${kube_git_version}" >"${polyrepo_dest_root_dir}"/env.sh
+  echo "export KUBE_MAIN_GIT_VERSION=${kube_git_version}" >"${polyrepo_dest_root_dir}"/env.sh
 
   # kind uses run.sh to build artifacts that we already have, hence we want to skip it using empty file
   echo '#!/usr/bin/env bash' >"${polyrepo_dest_root_dir}"/build/run.sh
@@ -53,7 +53,13 @@ export KUBE_BUILD_PLATFORMS="$GOOS/$GOARCH"
 KUBE_ROOT=$(dirname "${BASH_SOURCE[0]}")
 source "${KUBE_ROOT}/build/common.sh"
 source "${KUBE_ROOT}/build/lib/release.sh"
-source "${KUBE_ROOT}"/env.sh
+source "${KUBE_ROOT}/env.sh"
+
+if ./hack/print-workspace-status.sh | grep -q 'gitTreeState dirty'; then
+  export KUBE_GIT_VERSION="${KUBE_MAIN_GIT_VERSION}-dirty"
+else
+  export KUBE_GIT_VERSION="${KUBE_MAIN_GIT_VERSION}"
+fi
 
 DEST_DIR="_output/dockerized/bin/${GOOS}/${GOARCH}"
 
@@ -67,7 +73,12 @@ mkdir -p "${DEST_DIR}"
 [[ -f "./${DEST_DIR}/kube-proxy" ]] || cp "${ARTIFACTS_DIR}/kube-proxy" "./${DEST_DIR}/kube-proxy"
 [[ -f "./${DEST_DIR}/kube-scheduler" ]] || cp "${ARTIFACTS_DIR}/kube-scheduler" "./${DEST_DIR}/kube-scheduler"
 
+chmod 755 "./${DEST_DIR}/"*
+
 kube::release::build_server_images
+
+# hack to fix double dirty
+KUBE_GIT_VERSION="${KUBE_MAIN_GIT_VERSION}"
 kind build node-image --kube-root "${KUBE_ROOT}"
 
 [[ -f ./kubectl ]] || cp "./${DEST_DIR}/kubectl" ./kubectl

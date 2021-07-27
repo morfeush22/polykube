@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y \
       jq \
       make \
       psmisc \
+      rsync \
  && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSL https://github.com/coreos/etcd/releases/download/$ETCD_VERSION/etcd-$ETCD_VERSION-linux-amd64.tar.gz \

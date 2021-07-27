@@ -13,6 +13,12 @@ main() {
   local component_relative_path="$2"
   local destination_path="$3"
 
+  waitress "${kubernetes_repo_root_dir}" "hack" "${destination_path}"
+
+  # needed by build script
+  waitress "${kubernetes_repo_root_dir}" "vendor/github.com/willf/bitset" "${destination_path}"
+  waitress "${kubernetes_repo_root_dir}" "vendor/github.com/opencontainers/selinux/pkg/pwalk" "${destination_path}"
+
   TEST_TARGETS="[${component_relative_path}]"
 
   TARGET="${component_relative_path}" TEST_TARGETS="${TEST_TARGETS}" \

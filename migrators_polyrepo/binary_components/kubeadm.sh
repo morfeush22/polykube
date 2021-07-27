@@ -13,21 +13,30 @@ main() {
   local component_relative_path="$2"
   local destination_path="$3"
 
+  waitress "${kubernetes_repo_root_dir}" "hack" "${destination_path}"
+
+  local version_file_name="version.sh"
+  local version_file_dest_path="${destination_path}/${version_file_name}"
+
+  # deadbeaf
+  cat <<'EOF' >"${version_file_dest_path}"
+export KUBE_GIT_MAJOR='0340'
+export KUBE_GIT_MINOR='8347'
+export KUBE_GIT_TREE_STATE='clean'
+export KUBE_GIT_COMMIT='03408347'
+
+EOF
+
+  chmod 755 "${version_file_dest_path}"
+
   TEST_TARGETS="[${component_relative_path}]"
 
-  ENVS='
-  KUBEADM_PATH: $(PWD)/kubeadm
-'
-
-  BUILD_FLAGS="
-  [
-    -X 'k8s.io/component-base/version.gitMajor=0340',
-    -X 'k8s.io/component-base/version.gitMinor=8347',
-    -X 'k8s.io/component-base/version.gitTreeState=clean'
-  ]
+  ENVS="
+  KUBEADM_PATH: \$(PWD)/kubeadm
+  KUBE_GIT_VERSION_FILE: \$(PWD)/${version_file_name}
 "
 
-  ENVS="${ENVS}" BUILD_FLAGS="${BUILD_FLAGS}" TARGET="${component_relative_path}" TEST_TARGETS="${TEST_TARGETS}" \
+  ENVS="${ENVS}" TARGET="${component_relative_path}" TEST_TARGETS="${TEST_TARGETS}" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
 }
 

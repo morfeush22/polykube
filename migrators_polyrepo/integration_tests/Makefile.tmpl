@@ -15,7 +15,7 @@ tests: {{ join (keys $test_targets_escaped) " " }}
 {{ $key }}:
 	cd {{ $value }} && go test \
 		{{ if ne $parallelism "" }}-parallel {{ $parallelism }}{{ end }} \
-		{{ if ne $timeout "" }}-timeout {{ $timeout }}{{ end }} \
+		{{ if ne $timeout "" }}-timeout {{ $timeout }}s{{ end }} \
 		./...
 {{ end }}
 

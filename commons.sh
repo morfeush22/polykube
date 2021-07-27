@@ -266,7 +266,16 @@ twin() {
   fi
 
   if [[ ! -L ${dst_abs_path} ]]; then
-    ln -s "${src_abs_path}" "${dst_abs_path}"
+    pushd "${dest_dir}" || return
+
+    local link_name="${dst_abs_path##*/}"
+
+    local relative_path
+    relative_path="$(realpath --relative-to . "${src_abs_path}")"
+
+    ln -s "${relative_path}" "${link_name}"
+
+    popd || return
   else
     WARN "symbolic link ${dst_abs_path} already exist"
   fi

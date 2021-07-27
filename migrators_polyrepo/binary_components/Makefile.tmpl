@@ -8,14 +8,14 @@
 {{- $test_targets_escaped = merge $test_targets_escaped (dict (printf "test_%s" (strings.ReplaceAll "/" "_" $test_target)) $test_target) -}}
 {{- end -}}
 
+{{ if $ldflags }}export GOLDFLAGS := {{ $ldflags }}{{ end }}
+
 all: build tests
 
 build:
-	cd {{ $target }} && go build \
-		{{ if $ldflags }}-ldflags="{{ $ldflags }}"{{ end }} \
-		.
+	hack/make-rules/build.sh {{ $target }}
 
-	cp {{ $target }}/{{ $bin }} .
+	cp ./_output/bin/{{ $bin }} .
 
 tests: {{ join (keys $test_targets_escaped) " " }}
 

@@ -13,6 +13,8 @@ main() {
   local component_relative_path="$2"
   local destination_path="$3"
 
+  waitress "${kubernetes_repo_root_dir}" "hack" "${destination_path}"
+
   TARGET="${component_relative_path}" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
 }
