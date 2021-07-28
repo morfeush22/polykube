@@ -15,9 +15,19 @@ main() {
 
   waitress "${kubernetes_repo_root_dir}" "hack" "${destination_path}"
 
+  local version_file_name="version.sh"
+  "$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/hack/version.sh \
+    "${kubernetes_repo_root_dir}" \
+    "${destination_path}" \
+    "${version_file_name}"
+
+  ENVS="
+  KUBE_GIT_VERSION_FILE: \$(PWD)/${version_file_name}
+"
+
   TEST_TARGETS="[${component_relative_path}]"
 
-  TARGET="${component_relative_path}" TEST_TARGETS="${TEST_TARGETS}" \
+  ENVS="${ENVS}" TARGET="${component_relative_path}" TEST_TARGETS="${TEST_TARGETS}" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
 }
 

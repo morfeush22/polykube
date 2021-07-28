@@ -41,13 +41,15 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-DEST_DIR="_output/dockerized/bin/${GOOS}/${GOARCH}"
+DEST_DIR="_output/local/bin/${GOOS}/${GOARCH}"
 
 mkdir -p "${DEST_DIR}"
 
 [[ -f "./${DEST_DIR}/kubectl" ]] || cp "${ARTIFACTS_DIR}/kubectl" "./${DEST_DIR}/kubectl"
 [[ -f "./${DEST_DIR}/kube-apiserver" ]] || cp "${ARTIFACTS_DIR}/kube-apiserver" "./${DEST_DIR}/kube-apiserver"
 [[ -f "./${DEST_DIR}/kube-controller-manager" ]] || cp "${ARTIFACTS_DIR}/kube-controller-manager" "./${DEST_DIR}/kube-controller-manager"
+
+chmod 755 "./${DEST_DIR}/"*
 
 EOF
 

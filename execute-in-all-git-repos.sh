@@ -18,6 +18,7 @@ main() {
 
     pushd "${git_repo_main_dir}" || return
 
+    echo "${WHAT}"
     eval "${WHAT}"
 
     popd

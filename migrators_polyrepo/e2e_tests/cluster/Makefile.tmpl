@@ -24,4 +24,5 @@ setup:
 		-v4
 
 teardown:
-	kind delete cluster
+	kind delete cluster \
+		--name $(KIND_CLUSTER_NAME)
