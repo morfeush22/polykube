@@ -57,3 +57,5 @@ USER go
 RUN GO111MODULE="on" go get sigs.k8s.io/kind@$KIND_VERSION
 
 ENV PATH="/home/go/go/bin:$PATH"
+
+ENV GOMAXPROCS=1

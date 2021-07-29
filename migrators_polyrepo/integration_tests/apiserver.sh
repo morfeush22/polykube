@@ -13,12 +13,13 @@ main() {
   local component_relative_path="$2"
   local destination_path="$3"
 
+  waitress "${kubernetes_repo_root_dir}" "api" "${destination_path}"
   waitress "${kubernetes_repo_root_dir}" "cmd/kube-apiserver/app/testing/testdata" "${destination_path}"
   waitress "${kubernetes_repo_root_dir}" "vendor/k8s.io/apiextensions-apiserver/pkg/cmd/server/testing/testdata" "${destination_path}"
 
   TEST_TARGETS="[${component_relative_path}]"
 
-  PARALLELISM=1 TIMEOUT=600 TEST_TARGETS="${TEST_TARGETS}" \
+  PARALLELISM=1 TIMEOUT=3600 TEST_TARGETS="${TEST_TARGETS}" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
 }
 

@@ -15,6 +15,22 @@ pause_all_pipelines:
 unpause_all_pipelines:
 	./unpause-all-pipelines.sh $(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)
 
+enable_maintenance_mode:
+	curl \
+		-fsSL \
+		-H 'Accept: application/vnd.go.cd.v1+json' \
+		-H 'X-GoCD-Confirm:true' \
+		-X POST \
+		'http://$(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)/go/api/admin/maintenance_mode/enable'
+
+disable_maintenance_mode:
+	curl \
+		-fsSL \
+		-H 'Accept: application/vnd.go.cd.v1+json' \
+		-H 'X-GoCD-Confirm:true' \
+		-X POST \
+		'http://$(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)/go/api/admin/maintenance_mode/disable'
+
 run_gocd_clients_common: RUN_GOCD_CLIENTS_COMMON_GOCD_SERVER_LISTEN_HOST ?= $(GOCD_SERVER_LISTEN_HOST)
 run_gocd_clients_common:
 	for i in $$(seq 1 $(NUM_GOCD_CLIENTS_COMMON)); do \
