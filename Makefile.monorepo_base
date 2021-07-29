@@ -21,7 +21,10 @@ clean_monorepo:
 MONOREPO_GOCD_YAMLS_RELATIVE_DIR  := gocd_yamls
 MONOREPO_GOCD_YAMLS_DEST_ROOT_DIR := $(MONOREPO_DEST_ROOT_DIR)/$(MONOREPO_GOCD_YAMLS_RELATIVE_DIR)
 
+create_monorepo_gocd_yamls_subdir: export GIT_SERVER_LISTEN_HOST := $(GIT_SERVER_LISTEN_HOST)
+create_monorepo_gocd_yamls_subdir: export GIT_SERVER_LISTEN_PORT := $(GIT_SERVER_LISTEN_PORT)
 create_monorepo_gocd_yamls_subdir:
 	mkdir -p $(MONOREPO_GOCD_YAMLS_DEST_ROOT_DIR)
 
+	gomplate -f ./scripts_monorepo/pipeline.yaml.tmpl -o ./scripts_monorepo/pipeline.yaml
 	cp ./scripts_monorepo/pipeline.yaml $(MONOREPO_GOCD_YAMLS_DEST_ROOT_DIR)

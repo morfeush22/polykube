@@ -1,6 +1,13 @@
+environments:
+  common:
+    pipelines:
+      - monorepo_pipeline_common
+  e2e_cluster:
+    pipelines:
+      - monorepo_pipeline_e2e
 format_version: 10
 pipelines:
-  monorepo_pipeline:
+  monorepo_pipeline_common:
     display_order: -1
     environment_variables:
       MATERIAL_NAME: monorepo_pipeline
@@ -11,7 +18,7 @@ pipelines:
       monorepo_material:
         auto_update: true
         branch: master
-        git: http://localhost:8082/monorepo/kubernetes.git
+        git: http://{{ getenv "GIT_SERVER_LISTEN_HOST" }}:{{ getenv "GIT_SERVER_LISTEN_PORT" }}/monorepo/kubernetes.git
         shallow_clone: false
     stages:
       - build:
@@ -86,6 +93,24 @@ pipelines:
                     run_if: passed
               timeout: 0
           keep_artifacts: false
+  monorepo_pipeline_e2e:
+    display_order: -1
+    environment_variables:
+      MATERIAL_NAME: monorepo_pipeline
+    group: MONOREPO
+    label_template: ${COUNT}
+    lock_behavior: none
+    materials:
+      monorepo_material:
+        auto_update: true
+        branch: master
+        git: http://{{ getenv "GIT_SERVER_LISTEN_HOST" }}:{{ getenv "GIT_SERVER_LISTEN_PORT" }}/monorepo/kubernetes.git
+        shallow_clone: false
+      monorepo_pipeline_common:
+        ignore_for_scheduling: false
+        pipeline: monorepo_pipeline_common
+        stage: e2e_cmd
+    stages:
       - e2e_cluster:
           approval:
             allow_only_on_success: false
