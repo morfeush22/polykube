@@ -1,22 +1,26 @@
-export KUBECONFIG        := $(HOME)/.kube/kind-test-config
-export KIND_CLUSTER_NAME := $(subst _,-,kind-$(GO_PIPELINE_NAME)-$(GO_PIPELINE_COUNTER))
+export KUBECONFIG        := $(HOME)/.kube/config
+export KIND_CLUSTER_NAME := $(subst _,-,$(GO_PIPELINE_NAME)-$(GO_PIPELINE_COUNTER))
 
 cluster:
 	go test -c ./test/e2e_kubeadm
 	go test -c ./test/e2e
 
-	./e2e_kubeadm.test --context $(KIND_CLUSTER_NAME) --num-nodes 2 --ginkgo.skip="\[copy-certs\]"
-	./e2e.test --kubectl-path ./kubectl --context $(KIND_CLUSTER_NAME) --num-nodes 2 --ginkgo.focus="\[Conformance\]"
+	./e2e_kubeadm.test --context kind-$(KIND_CLUSTER_NAME) --num-nodes 2 --ginkgo.skip="\[copy-certs\]"
+	./e2e.test --kubectl-path ./kubectl --context kind-$(KIND_CLUSTER_NAME) --num-nodes 2 --ginkgo.focus="\[Conformance\]"
 
 bootstrap:
 	kind build node-image --kube-root .
+	cp ./_output/bin/kubectl .
 
 # kind
 setup:
+	rm -f $(KUBECONFIG)
+
 	kind create cluster \
 		--config ./kind-config.yaml \
 		--image kindest/node:latest \
 		-v4
 
 teardown:
-	kind delete cluster
+	kind delete cluster \
+		--name $(KIND_CLUSTER_NAME)
