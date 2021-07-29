@@ -124,25 +124,25 @@ pipelines:
                 - exec:
                     arguments:
                       - -c
-                      - set -a; eval `go env`; set +a; make bootstrap
+                      - set -a; eval `go env`; set +a; make -f ./Makefile.e2e_cluster bootstrap
                     command: /bin/bash
                     run_if: passed
                 - exec:
                     arguments:
                       - -c
-                      - set -a; eval `go env`; set +a; make setup
+                      - set -a; eval `go env`; set +a; make -f ./Makefile.e2e_cluster setup
                     command: /bin/bash
                     run_if: passed
                 - exec:
                     arguments:
                       - -c
-                      - set -a; eval `go env`; set +a; make cluster
+                      - set -a; eval `go env`; set +a; make -f ./Makefile.e2e_cluster cluster
                     command: /bin/bash
                     run_if: passed
                 - exec:
                     arguments:
                       - -c
-                      - set -a; eval `go env`; set +a; make teardown
+                      - set -a; eval `go env`; set +a; make -f ./Makefile.e2e_cluster teardown
                     command: /bin/bash
                     run_if: any
               timeout: 0
