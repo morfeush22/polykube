@@ -1,6 +1,8 @@
 export KUBECONFIG        := $(HOME)/.kube/config
 export KIND_CLUSTER_NAME := $(subst _,-,$(GO_PIPELINE_NAME)-$(GO_PIPELINE_COUNTER))
 
+.PHONY: cluster
+
 cluster:
 	go test -c ./test/e2e_kubeadm
 	go test -c ./test/e2e
