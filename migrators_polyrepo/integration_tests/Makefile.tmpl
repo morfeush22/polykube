@@ -4,8 +4,8 @@
 {{- $test_targets_escaped = merge $test_targets_escaped (dict (strings.ReplaceAll "/" "_" $test_target) $test_target) -}}
 {{- end -}}
 
-{{- $parallelism := getenv "PARALLELISM" "" -}}
-{{- $timeout := getenv "TIMEOUT" "" -}}
+{{- $parallelism := getenv "PARALLELISM" "1" -}}
+{{- $timeout := getenv "TIMEOUT" "600" -}}
 
 all: tests
 
@@ -14,8 +14,8 @@ tests: {{ join (keys $test_targets_escaped) " " }}
 {{ range $key, $value := $test_targets_escaped }}
 {{ $key }}:
 	cd {{ $value }} && go test \
-		{{ if ne $parallelism "" }}-p {{ $parallelism }}{{ end }} \
-		{{ if ne $timeout "" }}-timeout {{ $timeout }}s{{ end }} \
+		-p {{ $parallelism }} \
+		-timeout {{ $timeout }}s \
 		./...
 {{ end }}
 

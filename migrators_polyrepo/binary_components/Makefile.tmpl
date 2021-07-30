@@ -1,3 +1,6 @@
+{{- $parallelism := getenv "PARALLELISM" "1" -}}
+{{- $timeout := getenv "TIMEOUT" "300" -}}
+
 {{- $target := (getenv "TARGET") -}}
 {{- $ldflags := join (getenv "BUILD_FLAGS" "[]" | yamlArray) " " -}}
 {{- $bin := filepath.Base $target -}}
@@ -21,7 +24,10 @@ tests: {{ join (keys $test_targets_escaped) " " }}
 
 {{ range $key, $value := $test_targets_escaped }}
 {{ $key }}:
-	cd {{ $value }} && go test ./...
+	cd {{ $value }} && go test \
+		-p {{ $parallelism }} \
+		-timeout {{ $timeout }}s \
+		./...
 {{ end }}
 
 {{ range $key, $value := (getenv "ENVS" | yaml) }}
