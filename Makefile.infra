@@ -35,6 +35,7 @@ run_gocd_clients_common: RUN_GOCD_CLIENTS_COMMON_GOCD_SERVER_LISTEN_HOST ?= $(GO
 run_gocd_clients_common:
 	for i in $$(seq 1 $(NUM_GOCD_CLIENTS_COMMON)); do \
 		docker run \
+			--cpus 1 \
 			--detach \
 			--tty \
 			--privileged \
@@ -69,6 +70,7 @@ run_gocd_clients_e2e_cluster: RUN_GOCD_CLIENTS_E2E_CLUSTER_GOCD_SERVER_LISTEN_HO
 run_gocd_clients_e2e_cluster:
 	for i in $$(seq 1 $(NUM_GOCD_CLIENTS_E2E_CLUSTER)); do \
 		docker run \
+			--cpus 1 \
 			--detach \
 			--tty \
 			--privileged \
