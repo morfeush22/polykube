@@ -3,6 +3,7 @@
 set -o errexit
 set -o nounset
 set -o pipefail
+set -o xtrace
 
 make all WHAT=./staging/src/k8s.io/apiextensions-apiserver
 make all WHAT=./staging/src/k8s.io/kube-aggregator

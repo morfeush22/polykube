@@ -9,8 +9,7 @@ cluster:
 	./e2e.test --kubectl-path ./kubectl --context kind-$(KIND_CLUSTER_NAME) --num-nodes 2 --ginkgo.focus="\[Conformance\]"
 
 bootstrap:
-	kind build node-image --kube-root .
-	cp ./_output/bin/kubectl .
+	./bootstrap.sh
 
 # kind
 setup:

@@ -15,7 +15,7 @@ main() {
 
   waitress "${kubernetes_repo_root_dir}" "pkg/client/testdata" "${destination_path}"
 
-  TARGETS="[${component_relative_path}]" \
+  TIMEOUT=600 TARGETS="[${component_relative_path}]" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
 }
 

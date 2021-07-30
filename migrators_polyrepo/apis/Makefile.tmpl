@@ -1,6 +1,12 @@
+{{- $parallelism := getenv "PARALLELISM" "" -}}
+{{- $timeout := getenv "TIMEOUT" "" -}}
+
 {{- $targets := (getenv "TARGETS" | yamlArray) -}}
 all: {{ join $targets " " | strings.ReplaceAll "/" "_" }}
 {{ range $_, $target := $targets }}
 {{ strings.ReplaceAll "/" "_" $target }}:
-	cd {{ $target }} && go test ./...
+	cd {{ $target }} && go test \
+		{{ if ne $parallelism "" }}-p {{ $parallelism }}{{ end }} \
+		{{ if ne $timeout "" }}-timeout {{ $timeout }}s{{ end }} \
+		./...
 {{ end }}
