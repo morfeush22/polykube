@@ -16,6 +16,9 @@
 all: build tests
 
 build:
+	go clean -cache
+	go clean -testcache
+
 	hack/make-rules/build.sh {{ $target }}
 
 	cp ./_output/bin/{{ $bin }} .
@@ -24,6 +27,9 @@ tests: {{ join (keys $test_targets_escaped) " " }}
 
 {{ range $key, $value := $test_targets_escaped }}
 {{ $key }}:
+	go clean -cache
+	go clean -testcache
+
 	cd {{ $value }} && go test \
 		-p {{ $parallelism }} \
 		-timeout {{ $timeout }}s \

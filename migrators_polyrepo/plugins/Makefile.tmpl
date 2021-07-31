@@ -9,6 +9,9 @@ tests: {{ join $targets " " | strings.ReplaceAll "/" "_" }}
 
 {{ range $_, $target := $targets }}
 {{ strings.ReplaceAll "/" "_" $target }}:
+	go clean -cache
+	go clean -testcache
+
 	cd {{ $target }} && go test \
 		-p {{ $parallelism }} \
 		-timeout {{ $timeout }}s \

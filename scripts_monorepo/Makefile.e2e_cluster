@@ -4,6 +4,9 @@ export KIND_CLUSTER_NAME := $(subst _,-,$(GO_PIPELINE_NAME)-$(GO_PIPELINE_COUNTE
 .PHONY: cluster
 
 cluster:
+	go clean -cache
+	go clean -testcache
+
 	go test -c ./test/e2e_kubeadm
 	go test -c ./test/e2e
 

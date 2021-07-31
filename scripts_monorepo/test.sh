@@ -7,6 +7,9 @@ set -o xtrace
 
 export KUBE_TIMEOUT='-timeout=600s'
 
+go clean -cache
+go clean -testcache
+
 make test WHAT=./vendor/k8s.io/apiextensions-apiserver/pkg/...
 make test WHAT=./vendor/k8s.io/kube-aggregator/...
 make test WHAT=./cmd/kube-apiserver/...

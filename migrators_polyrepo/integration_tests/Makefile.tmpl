@@ -13,6 +13,9 @@ tests: {{ join (keys $test_targets_escaped) " " }}
 
 {{ range $key, $value := $test_targets_escaped }}
 {{ $key }}:
+	go clean -cache
+	go clean -testcache
+
 	cd {{ $value }} && go test \
 		-p {{ $parallelism }} \
 		-timeout {{ $timeout }}s \

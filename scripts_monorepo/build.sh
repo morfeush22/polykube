@@ -5,6 +5,9 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
+go clean -cache
+go clean -testcache
+
 make all WHAT=./staging/src/k8s.io/apiextensions-apiserver
 make all WHAT=./staging/src/k8s.io/kube-aggregator
 make all WHAT=./cmd/kube-apiserver

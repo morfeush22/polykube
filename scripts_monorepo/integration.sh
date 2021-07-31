@@ -7,6 +7,9 @@ set -o xtrace
 
 export KUBE_TIMEOUT='-timeout=1200s'
 
+go clean -cache
+go clean -testcache
+
 make test-integration WHAT=./vendor/k8s.io/apiextensions-apiserver/test/integration/...
 make test-integration WHAT=./test/integration/apimachinery/...
 make test-integration WHAT=./test/integration/apiserver/...
