@@ -13,7 +13,7 @@ main() {
   local component_relative_path="$2"
   local destination_path="$3"
 
-  TIMEOUT=600 TARGETS="[${component_relative_path}]" \
+  TARGETS="[${component_relative_path}]" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
 }
 

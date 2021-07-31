@@ -19,7 +19,7 @@ main() {
 
   TEST_TARGETS="[${component_relative_path}]"
 
-  PARALLELISM=1 TIMEOUT=3600 TEST_TARGETS="${TEST_TARGETS}" \
+  TEST_TARGETS="${TEST_TARGETS}" \
     party "${MAKEFILE_TEMPLATE_PATH}" "${destination_path}"
 }
 

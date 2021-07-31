@@ -1,5 +1,5 @@
 {{- $parallelism := getenv "PARALLELISM" "1" -}}
-{{- $timeout := getenv "TIMEOUT" "300" -}}
+{{- $timeout := getenv "TIMEOUT" "600" -}}
 
 {{- $targets := (getenv "TARGETS" | yamlArray) -}}
 all: {{ join $targets " " | strings.ReplaceAll "/" "_" }}
