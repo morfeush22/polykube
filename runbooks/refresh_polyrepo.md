@@ -1,6 +1,7 @@
 make pause_all_pipelines
 
-make execute_in_all_git_repos WHAT="rm -r ./*"
+WHAT="rm -r ./*"
+make execute_in_all_git_repos
 
 make migrate_all_to_polyrepo
 make polyrepo_construct_edge_file

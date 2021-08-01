@@ -1,6 +1,6 @@
 make delete_gocd_clients
 
-docker image prune -a
+docker image prune --all
 docker network prune
 docker volume prune
 
