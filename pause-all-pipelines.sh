@@ -18,7 +18,7 @@ main() {
     curl \
       -fsSL \
       -H 'Accept: application/vnd.go.cd.v3+json' \
-      "http://${gocd_server_url}/go/api/dashboard"
+      "${gocd_server_url}/go/api/dashboard"
   )"
 
   local pipelines

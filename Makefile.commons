@@ -2,3 +2,10 @@ execute_in_all_git_repos: export WHAT ?= "git status"
 execute_in_all_git_repos: EXECUTE_IN_ALL_GIT_REPOS_DEST_ROOT_DIR ?= $(POLYREPO_DEST_ROOT_DIR)
 execute_in_all_git_repos:
 	./execute-in-all-git-repos.sh $(EXECUTE_IN_ALL_GIT_REPOS_DEST_ROOT_DIR)
+
+calculate_pipelines_duration: FROM_DATE_MS ?= $(shell date +%s%3N)
+calculate_pipelines_duration:
+	$(VENV_PATH)/bin/python \
+		./calculate_pipelines_duration.py \
+		http://$(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT) \
+		$(FROM_DATE_MS)

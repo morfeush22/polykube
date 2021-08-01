@@ -10,10 +10,10 @@ NUM_GOCD_CLIENTS_COMMON      ?= 1
 NUM_GOCD_CLIENTS_E2E_CLUSTER ?= 1
 
 pause_all_pipelines:
-	./pause-all-pipelines.sh $(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)
+	./pause-all-pipelines.sh http://$(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)
 
 unpause_all_pipelines:
-	./unpause-all-pipelines.sh $(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)
+	./unpause-all-pipelines.sh http://$(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)
 
 enable_maintenance_mode:
 	curl \
