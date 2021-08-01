@@ -9,3 +9,7 @@ calculate_pipelines_duration:
 		./calculate_pipelines_duration.py \
 		http://$(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT) \
 		$(FROM_DATE_MS)
+
+execute_in_git_repos: export WHAT ?= git status
+execute_in_git_repos:
+	./execute-in-git-repos.sh $(GIT_REPOS_FILE)
