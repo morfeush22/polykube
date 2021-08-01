@@ -7,8 +7,8 @@ import yaml
 
 import polyrepo_filter_import_paths as fip
 from polyrepo_gocd_pipeline_templates import generate_binary_component_yaml_file, generate_integration_test_yaml_file, \
-    generate_api_yaml_file, generate_plugin_yaml_file, generate_staging_yaml_file, e2e_cluster_pipeline_name, \
-    e2e_cmd_pipeline_name, generate_e2e_test_cluster_yaml_file, generate_e2e_test_cmd_yaml_file, artifacts_dir_name
+    generate_api_yaml_file, generate_plugin_yaml_file, generate_staging_yaml_file, polyrepo_e2e_cluster_pipeline_name, \
+    polyrepo_e2e_cmd_pipeline_name, generate_e2e_test_cluster_yaml_file, generate_e2e_test_cmd_yaml_file, artifacts_dir_name
 
 LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
 logging.basicConfig(level=LOGLEVEL)
@@ -87,11 +87,11 @@ def escape_node_forbidden_chars(node):
 
 
 def construct_node_pipeline_name(node):
-    return f"{escape_node_forbidden_chars(node)}_pipeline"
+    return f"polyrepo_{escape_node_forbidden_chars(node)}_pipeline"
 
 
 def construct_node_material_name(node):
-    return f"{escape_node_forbidden_chars(node)}_material"
+    return f"polyrepo_{escape_node_forbidden_chars(node)}_material"
 
 
 def get_binary_artifact_name_from_node_name(node):
@@ -159,8 +159,8 @@ def generate_gocd_yaml_e2e_tests_files(e2e_cluster_test_node_triggers, e2e_cmd_t
                                        node_type_to_relative_dir,
                                        git_server_repos_prefix,
                                        gocd_yamls_dest_root_dir):
-    e2e_cluster_test_pipeline_name = e2e_cluster_pipeline_name
-    e2e_cmd_test_pipeline_name = e2e_cmd_pipeline_name
+    e2e_cluster_test_pipeline_name = polyrepo_e2e_cluster_pipeline_name
+    e2e_cmd_test_pipeline_name = polyrepo_e2e_cmd_pipeline_name
 
     e2e_cluster_test_gocd_yaml_dest_path = f"{gocd_yamls_dest_root_dir}/{e2e_cluster_test_pipeline_name}.yaml"
     e2e_cmd_test_gocd_yaml_dest_path = f"{gocd_yamls_dest_root_dir}/{e2e_cmd_test_pipeline_name}.yaml"

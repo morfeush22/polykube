@@ -6,8 +6,8 @@ _e2e_cluster_env_name = "e2e_cluster"
 
 artifacts_dir_name = "_artifacts"
 
-e2e_cluster_pipeline_name = "e2e_cluster"
-e2e_cmd_pipeline_name = "e2e_cmd"
+polyrepo_e2e_cluster_pipeline_name = "polyrepo_e2e_cluster_pipeline"
+polyrepo_e2e_cmd_pipeline_name = "polyrepo_e2e_cmd_pipeline"
 
 
 def generate_gocd_yaml_common_job(artifacts):
@@ -475,10 +475,10 @@ def generate_e2e_test_cluster_yaml_file(node_pipeline_triggers_list, group, node
                                         fetch_artifacts_list):
     return generate_gocd_yaml(
         pipelines={
-            e2e_cluster_pipeline_name: generate_gocd_yaml_pipeline(
+            polyrepo_e2e_cluster_pipeline_name: generate_gocd_yaml_pipeline(
                 group=group,
                 materials={
-                    e2e_cluster_pipeline_name: generate_gocd_yaml_git_material(
+                    polyrepo_e2e_cluster_pipeline_name: generate_gocd_yaml_git_material(
                         git_server_repo_path=node_git_server_repo_path
                     ),
                     **{
@@ -500,14 +500,14 @@ def generate_e2e_test_cluster_yaml_file(node_pipeline_triggers_list, group, node
                     }
                 ],
                 environment_variables={
-                    "MATERIAL_NAME": e2e_cluster_pipeline_name,
+                    "MATERIAL_NAME": polyrepo_e2e_cluster_pipeline_name,
                     "ARTIFACTS_DIR": artifacts_dir_name
                 }
 
             )
         },
         environments={
-            _e2e_cluster_env_name: generate_gocd_yaml_environment(e2e_cluster_pipeline_name)
+            _e2e_cluster_env_name: generate_gocd_yaml_environment(polyrepo_e2e_cluster_pipeline_name)
         }
     )
 
@@ -516,10 +516,10 @@ def generate_e2e_test_cmd_yaml_file(node_pipeline_triggers_list, group, node_git
                                     fetch_artifacts_list):
     return generate_gocd_yaml(
         pipelines={
-            e2e_cmd_pipeline_name: generate_gocd_yaml_pipeline(
+            polyrepo_e2e_cmd_pipeline_name: generate_gocd_yaml_pipeline(
                 group=group,
                 materials={
-                    e2e_cmd_pipeline_name: generate_gocd_yaml_git_material(
+                    polyrepo_e2e_cmd_pipeline_name: generate_gocd_yaml_git_material(
                         git_server_repo_path=node_git_server_repo_path
                     ),
                     **{
@@ -541,13 +541,13 @@ def generate_e2e_test_cmd_yaml_file(node_pipeline_triggers_list, group, node_git
                     }
                 ],
                 environment_variables={
-                    "MATERIAL_NAME": e2e_cmd_pipeline_name,
+                    "MATERIAL_NAME": polyrepo_e2e_cmd_pipeline_name,
                     "ARTIFACTS_DIR": artifacts_dir_name
                 }
 
             )
         },
         environments={
-            _common_env_name: generate_gocd_yaml_environment(e2e_cmd_pipeline_name)
+            _common_env_name: generate_gocd_yaml_environment(polyrepo_e2e_cmd_pipeline_name)
         }
     )
