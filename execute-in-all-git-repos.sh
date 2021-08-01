@@ -16,12 +16,12 @@ main() {
   for git_repo_subdir in $(find "${all_git_repos_root_dir}" -type d -name ".git"); do
     local git_repo_main_dir="${git_repo_subdir%/.git}"
 
-    pushd "${git_repo_main_dir}" || return
+    pushd "${git_repo_main_dir}" >&2 || return
 
-    echo "${WHAT}"
+    echo "${WHAT}" >&2
     eval "${WHAT}"
 
-    popd
+    popd >&2
   done
 }
 

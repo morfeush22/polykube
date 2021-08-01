@@ -16,12 +16,12 @@ main() {
   readarray -t git_repos_array <"${git_repos_file}"
 
   for git_repo_main_dir in "${git_repos_array[@]}"; do
-    pushd "${git_repo_main_dir}" || return
+    pushd "${git_repo_main_dir}" >&2 || return
 
-    echo "${WHAT}"
+    echo "${WHAT}" >&2
     eval "${WHAT}"
 
-    popd
+    popd >&2
   done
 }
 
