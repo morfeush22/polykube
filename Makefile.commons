@@ -1,4 +1,4 @@
-execute_in_all_git_repos: export WHAT ?= "git status"
+execute_in_all_git_repos: export WHAT ?= git status
 execute_in_all_git_repos: EXECUTE_IN_ALL_GIT_REPOS_DEST_ROOT_DIR ?= $(POLYREPO_DEST_ROOT_DIR)
 execute_in_all_git_repos:
 	./execute-in-all-git-repos.sh $(EXECUTE_IN_ALL_GIT_REPOS_DEST_ROOT_DIR)
