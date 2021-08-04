@@ -10,6 +10,7 @@ Test 1-3 worker nodes + 1 E2E test worker node.
 1. Save current timestamp (timestamp=`date +%s%3N`)
 1. Checkout desired commit in Kubernetes repository
 1. Refresh repositories
+1. Save changed files
 1. Save changed repositories names
 1. Run tests (make run_gocd_clients)
 1. Save results (make calculate_pipelines_duration FROM_DATE_MS=$timestamp) rollback and repeat 1/3 times from beginning
