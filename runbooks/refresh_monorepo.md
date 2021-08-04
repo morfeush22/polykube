@@ -1,7 +1,7 @@
 make pause_all_pipelines
 
 WHAT="rm -r ./*"
-make execute_in_all_git_repos EXECUTE_IN_ALL_GIT_REPOS_DEST_ROOT_DIR="${HOME}/Projects/masters/monorepo"
+WHAT="${WHAT}" make execute_in_all_git_repos EXECUTE_IN_ALL_GIT_REPOS_DEST_ROOT_DIR="${HOME}/Projects/masters/monorepo"
 
 make migrate_all_to_monorepo
 make create_monorepo_gocd_yamls_subdir
