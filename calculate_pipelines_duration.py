@@ -1,4 +1,5 @@
 import logging
+import math
 import os
 import sys
 from collections import defaultdict
@@ -21,6 +22,10 @@ class PipelineTimes:
     def add_times(self, wait_time, build_time):
         self.wait_time += wait_time
         self.build_time += build_time
+
+
+def get_scheduled_state_transition_time(job_state_transitions):
+    return job_state_transitions[0]["state_change_time"]
 
 
 def get_assigned_state_transition_time(job_state_transitions):
@@ -59,6 +64,9 @@ def extract_stage_times(detailed_stage_instance):
     wait_time = 0
     build_time = 0
 
+    min_scheduled_time = math.inf
+    max_completed_time = 0
+
     for job in detailed_stage_instance["jobs"]:
         if job["result"] != passed_result:
             logging.warning(f""
@@ -71,16 +79,21 @@ def extract_stage_times(detailed_stage_instance):
 
         job_state_transitions = job["job_state_transitions"]
 
+        scheduled_state_transition_time = get_scheduled_state_transition_time(job_state_transitions)
         preparing_state_transition_time = get_preparing_state_transition_time(job_state_transitions)
         building_state_transition_time = get_building_state_transition_time(job_state_transitions)
         completing_state_transition_time = get_completing_state_transition_time(job_state_transitions)
+        completed_state_transition_time = get_completed_state_transition_time(job_state_transitions)
 
-        job_scheduled_date = job["scheduled_date"]
+        min_scheduled_time = min(min_scheduled_time, scheduled_state_transition_time)
+        max_completed_time = max(max_completed_time, completed_state_transition_time)
+
+        job_scheduled_date = scheduled_state_transition_time
 
         wait_time += preparing_state_transition_time - job_scheduled_date
         build_time += completing_state_transition_time - building_state_transition_time
 
-    return wait_time, build_time
+    return wait_time, build_time, min_scheduled_time, max_completed_time
 
 
 def get_gocd_stage_instance(stage_instance_url):
@@ -114,6 +127,9 @@ def calculate_times_per_pipeline(gocd_server_url, pipelines_instances):
 
     pipelines_times = defaultdict(PipelineTimes)
 
+    run_start_time = math.inf
+    run_end_time = 0
+
     for pipeline_name, pipeline_instances in pipelines_instances.items():
         for pipeline_instance in pipeline_instances:
             pipeline_instance_wait_time = 0
@@ -139,14 +155,17 @@ def calculate_times_per_pipeline(gocd_server_url, pipelines_instances):
 
                 detailed_stage_instance = get_gocd_stage_instance(stage_instance_url)
 
-                stage_wait_time, stage_build_time = extract_stage_times(detailed_stage_instance)
+                stage_wait_time, stage_build_time, start_time, end_time = extract_stage_times(detailed_stage_instance)
+
+                run_start_time = min(run_start_time, start_time)
+                run_end_time = max(run_end_time, end_time)
 
                 pipeline_instance_wait_time += stage_wait_time
                 pipeline_instance_build_time += stage_build_time
 
             pipelines_times[pipeline_name].add_times(pipeline_instance_wait_time, pipeline_instance_build_time)
 
-    return pipelines_times
+    return pipelines_times, run_end_time - run_start_time
 
 
 def convert_ms_to_s(ms):
@@ -181,14 +200,21 @@ def print_pipelines_times(pipelines_times):
     print(tabulate(tabulate_data, headers=headers))
 
 
+def print_run_time(run_time):
+    print(f"time from start to end: {run_time}s")
+
+
 def main():
     gocd_server_url = sys.argv[1]
     scheduled_after_date = int(sys.argv[2])
 
     gocd_dashboard = get_gocd_dashboard(gocd_server_url)
     pipelines_instances = get_pipelines_instances_scheduled_after_date(gocd_dashboard, scheduled_after_date)
-    times_per_pipeline = calculate_times_per_pipeline(gocd_server_url, pipelines_instances)
+    times_per_pipeline, run_time = calculate_times_per_pipeline(gocd_server_url, pipelines_instances)
+
     print_pipelines_times(times_per_pipeline)
+    print()
+    print_run_time(run_time)
 
 
 if __name__ == "__main__":
