@@ -24,28 +24,32 @@ class PipelineTimes:
         self.build_time += build_time
 
 
+def get_job_state_transition_time(job_state_transitions, n):
+    return job_state_transitions[n]["state_change_time"]
+
+
 def get_scheduled_state_transition_time(job_state_transitions):
-    return job_state_transitions[0]["state_change_time"]
+    return get_job_state_transition_time(job_state_transitions, 0)
 
 
 def get_assigned_state_transition_time(job_state_transitions):
-    return job_state_transitions[1]["state_change_time"]
+    return get_job_state_transition_time(job_state_transitions, 1)
 
 
 def get_preparing_state_transition_time(job_state_transitions):
-    return job_state_transitions[2]["state_change_time"]
+    return get_job_state_transition_time(job_state_transitions, 2)
 
 
 def get_building_state_transition_time(job_state_transitions):
-    return job_state_transitions[3]["state_change_time"]
+    return get_job_state_transition_time(job_state_transitions, 3)
 
 
 def get_completing_state_transition_time(job_state_transitions):
-    return job_state_transitions[4]["state_change_time"]
+    return get_job_state_transition_time(job_state_transitions, 4)
 
 
 def get_completed_state_transition_time(job_state_transitions):
-    return job_state_transitions[5]["state_change_time"]
+    return get_job_state_transition_time(job_state_transitions, 5)
 
 
 def get_gocd_pipeline_history(pipeline_history_url):
@@ -61,8 +65,8 @@ def construct_stage_url(gocd_server_url, pipeline_name, pipeline_counter, stage_
 def extract_stage_times(detailed_stage_instance):
     passed_result = "Passed"
 
-    wait_time = 0
-    build_time = 0
+    wait_time_sum = 0
+    build_time_sum = 0
 
     min_scheduled_time = math.inf
     max_completed_time = 0
@@ -74,26 +78,39 @@ def extract_stage_times(detailed_stage_instance):
                             f"{detailed_stage_instance['name']}/{detailed_stage_instance['counter']} "
                             f"of "
                             f"{detailed_stage_instance['pipeline_name']}/{detailed_stage_instance['pipeline_counter']} "
-                            f"not in {passed_result} result")
-            continue
+                            f"not in {passed_result} result ({job['result']})")
 
-        job_state_transitions = job["job_state_transitions"]
+        scheduled_time, completed_time, wait_time, build_time = extract_job_times(job)
 
-        scheduled_state_transition_time = get_scheduled_state_transition_time(job_state_transitions)
-        preparing_state_transition_time = get_preparing_state_transition_time(job_state_transitions)
-        building_state_transition_time = get_building_state_transition_time(job_state_transitions)
-        completing_state_transition_time = get_completing_state_transition_time(job_state_transitions)
-        completed_state_transition_time = get_completed_state_transition_time(job_state_transitions)
+        min_scheduled_time = min(min_scheduled_time, scheduled_time)
+        max_completed_time = max(max_completed_time, completed_time)
 
-        min_scheduled_time = min(min_scheduled_time, scheduled_state_transition_time)
-        max_completed_time = max(max_completed_time, completed_state_transition_time)
+        wait_time_sum += wait_time
+        build_time_sum += build_time
 
-        job_scheduled_date = scheduled_state_transition_time
+    return wait_time_sum, build_time_sum, min_scheduled_time, max_completed_time
 
-        wait_time += preparing_state_transition_time - job_scheduled_date
-        build_time += completing_state_transition_time - building_state_transition_time
 
-    return wait_time, build_time, min_scheduled_time, max_completed_time
+def extract_job_times(job):
+    passed_pipeline_state_transitions_number = 6
+
+    job_state_transitions = job["job_state_transitions"]
+
+    if len(job_state_transitions) < passed_pipeline_state_transitions_number:
+        job_states = ",".join([transition['state'] for transition in job_state_transitions])
+        logging.warning(f"found less than {passed_pipeline_state_transitions_number} states: {job_states}")
+        return math.inf, 0, 0, 0
+
+    scheduled_state_transition_time = get_scheduled_state_transition_time(job_state_transitions)
+    preparing_state_transition_time = get_preparing_state_transition_time(job_state_transitions)
+    building_state_transition_time = get_building_state_transition_time(job_state_transitions)
+    completing_state_transition_time = get_completing_state_transition_time(job_state_transitions)
+    completed_state_transition_time = get_completed_state_transition_time(job_state_transitions)
+
+    wait_time = preparing_state_transition_time - scheduled_state_transition_time
+    build_time = completing_state_transition_time - building_state_transition_time
+
+    return scheduled_state_transition_time, completed_state_transition_time, wait_time, build_time
 
 
 def get_gocd_stage_instance(stage_instance_url):
@@ -142,7 +159,7 @@ def calculate_times_per_pipeline(gocd_server_url, pipelines_instances):
                                     f"{stage['name']}/{stage['counter']} "
                                     f"of "
                                     f"{pipeline_instance['name']}/{pipeline_instance['counter']} "
-                                    f"not in {passed_status} state")
+                                    f"not in {passed_status} state ({stage['status']})")
                     continue
 
                 stage_instance_url = construct_stage_url(

@@ -6,6 +6,7 @@ Test 1-3 worker nodes + 1 E2E test worker node.
 
 1. Start server infrastructure (make start_server_infra)
 1. Pause/unpause desired pipelines (monorepo/polyrepo)
+1. Prune docker (docker image prune --all, docker volume prune, docker network prune)
 1. Stop GoCD clients (make delete_gocd_clients)
 1. Start GoCD clients(make run_gocd_clients)
 1. Save current timestamp (timestamp=`date +%s%3N`)

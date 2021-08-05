@@ -26,8 +26,8 @@ main() {
 export KUBE_GIT_COMMIT="${kube_git_commit}"
 export KUBE_GIT_TREE_STATE="clean"
 export KUBE_GIT_VERSION="${kube_git_version}"
-export KUBE_GIT_MAJOR="$(sed -n 's/^v\(.*\)\..*\..*$/\1/p' <<<"${kube_git_version}")"
-export KUBE_GIT_MINOR="$(sed -n 's/^v.*\.\(.*\)\..*$/\1/p' <<<"${kube_git_version}")"
+export KUBE_GIT_MAJOR="$(sed -n 's/^v\([[:digit:]]*\)\..*\..*$/\1/p' <<<"${kube_git_version}")"
+export KUBE_GIT_MINOR="$(sed -n 's/^v[[:digit:]]*\.\([[:digit:]]*\)\..*$/\1/p' <<<"${kube_git_version}")"
 
 EOF
 
