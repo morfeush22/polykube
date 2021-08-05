@@ -2,10 +2,11 @@ import logging
 import math
 import os
 import sys
+import time
 from collections import defaultdict
-from tabulate import tabulate
 
 import requests
+from tabulate import tabulate
 
 LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
 logging.basicConfig(level=LOGLEVEL)
@@ -125,7 +126,7 @@ def get_gocd_dashboard(gocd_server_url):
     return response.json()
 
 
-def get_pipelines_instances_scheduled_after_date(gocd_dashboard, scheduled_after_date):
+def get_pipelines_instances_scheduled_between_dates(gocd_dashboard, scheduled_after_date, scheduled_before_date):
     pipeline_instances_scheduled_after_date = defaultdict(list)
 
     for pipeline in gocd_dashboard["_embedded"]["pipelines"]:
@@ -133,7 +134,7 @@ def get_pipelines_instances_scheduled_after_date(gocd_dashboard, scheduled_after
         pipeline_history = get_gocd_pipeline_history(pipeline_history_url)
 
         for pipeline_instance in pipeline_history["pipelines"]:
-            if pipeline_instance["scheduled_date"] > scheduled_after_date:
+            if scheduled_after_date < pipeline_instance["scheduled_date"] < scheduled_before_date:
                 pipeline_instances_scheduled_after_date[pipeline_instance["name"]].append(pipeline_instance)
 
     return pipeline_instances_scheduled_after_date
@@ -221,12 +222,20 @@ def print_run_time(run_time):
     print(f"time from start to end: {run_time}s")
 
 
+def now_ms():
+    return round(time.time() * 1000)
+
+
 def main():
     gocd_server_url = sys.argv[1]
     scheduled_after_date = int(sys.argv[2])
 
     gocd_dashboard = get_gocd_dashboard(gocd_server_url)
-    pipelines_instances = get_pipelines_instances_scheduled_after_date(gocd_dashboard, scheduled_after_date)
+    pipelines_instances = get_pipelines_instances_scheduled_between_dates(
+        gocd_dashboard,
+        scheduled_after_date,
+        now_ms()
+    )
     times_per_pipeline, run_time = calculate_times_per_pipeline(gocd_server_url, pipelines_instances)
 
     print_pipelines_times(times_per_pipeline)
