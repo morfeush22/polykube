@@ -6,7 +6,7 @@ GOCD_POSTGRESQL_NAME      := gocd_postgresql
 
 GOCD_POSTGRESQL_PASSWORD := postgres
 
-NUM_GOCD_CLIENTS_COMMON      ?= 1
+NUM_GOCD_CLIENTS_COMMON      ?= 2
 NUM_GOCD_CLIENTS_E2E_CLUSTER ?= 1
 
 pause_all_pipelines:
