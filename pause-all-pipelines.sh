@@ -12,6 +12,7 @@ LOG_LEVEL_WARN
 
 main() {
   local gocd_server_url="$1"
+  local regexp_filter="$2"
 
   local dashboard
   dashboard="$(
@@ -30,6 +31,10 @@ main() {
 
   for pipeline in ${pipelines}; do
     local pipeline_pause_url="${pipeline%/history}/pause"
+
+    if ! grep -q "${regexp_filter}" <<<"${pipeline}"; then
+      continue
+    fi
 
     echo "${pipeline_pause_url}"
 
