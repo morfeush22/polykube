@@ -8,12 +8,13 @@ Test 1-3 worker nodes + 1 E2E test worker node.
 1. Pause/unpause desired pipelines (monorepo/polyrepo)
 1. Prune docker (docker image prune --all, docker volume prune, docker network prune)
 1. Stop GoCD clients (make delete_gocd_clients)
-1. Start GoCD clients(make run_gocd_clients)
+1. Start GoCD clients (make run_gocd_clients) (check number of workers)
 1. Save current timestamp (timestamp=`date +%s%3N`)
 1. Checkout desired commit in Kubernetes repository
 1. Refresh repositories
     1. Save changed files (easiest in monorepo)
     1. Save changed repositories names (check subset_repos_ops.md)
+1. Unpause pipelines (i.e. make unpause_all_pipelines REGEXP_FILTER='polyrepo')
 1. Save results (make calculate_pipelines_duration FROM_DATE_MS=$timestamp) rollback and repeat 1/3 times from beginning
 
 To revert:
