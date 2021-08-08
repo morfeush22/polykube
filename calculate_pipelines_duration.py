@@ -14,15 +14,22 @@ logging.basicConfig(level=LOGLEVEL)
 
 class PipelineTimes:
 
-    def __init__(self, wait_time=0, build_time=0):
+    def __init__(self, wait_time=0, build_time=0, count=0, passing_count=0):
         self.wait_time = wait_time
         self.build_time = build_time
+        self.count = count
+        self.passing_count = passing_count
 
         super().__init__()
 
     def add_times(self, wait_time, build_time):
         self.wait_time += wait_time
         self.build_time += build_time
+        self.count += 1
+
+    def add_status(self, passing):
+        if passing:
+            self.passing_count += 1
 
 
 def get_job_state_transition_time(job_state_transitions, n):
@@ -75,10 +82,11 @@ def extract_stage_times(detailed_stage_instance):
     for job in detailed_stage_instance["jobs"]:
         if job["result"] != passed_result:
             logging.warning(f""
-                            f"stage instance "
-                            f"{detailed_stage_instance['name']}/{detailed_stage_instance['counter']} "
+                            f"job instance "
+                            f"{job['name']} "
                             f"of "
-                            f"{detailed_stage_instance['pipeline_name']}/{detailed_stage_instance['pipeline_counter']} "
+                            f"{detailed_stage_instance['pipeline_name']}/{detailed_stage_instance['pipeline_counter']}/"
+                            f"{detailed_stage_instance['name']}/{detailed_stage_instance['counter']} "
                             f"not in {passed_result} result ({job['result']})")
 
         scheduled_time, completed_time, wait_time, build_time = extract_job_times(job)
@@ -152,16 +160,17 @@ def calculate_times_per_pipeline(gocd_server_url, pipelines_instances):
         for pipeline_instance in pipeline_instances:
             pipeline_instance_wait_time = 0
             pipeline_instance_build_time = 0
+            passing = True
 
             for stage in pipeline_instance["stages"]:
                 if stage["status"] != passed_status:
+                    passing = False
                     logging.warning(f""
                                     f"stage instance "
                                     f"{stage['name']}/{stage['counter']} "
                                     f"of "
                                     f"{pipeline_instance['name']}/{pipeline_instance['counter']} "
                                     f"not in {passed_status} state ({stage['status']})")
-                    continue
 
                 stage_instance_url = construct_stage_url(
                     gocd_server_url,
@@ -182,6 +191,7 @@ def calculate_times_per_pipeline(gocd_server_url, pipelines_instances):
                 pipeline_instance_build_time += stage_build_time
 
             pipelines_times[pipeline_name].add_times(pipeline_instance_wait_time, pipeline_instance_build_time)
+            pipelines_times[pipeline_name].add_status(passing)
 
     return pipelines_times, run_end_time - run_start_time
 
@@ -200,20 +210,24 @@ def print_pipelines_times(pipelines_times):
     total_wait_time = 0
     total_build_time = 0
 
-    headers = ["pipeline_name", "wait_time[s]", "build_time[s]"]
+    headers = ["pipeline_name", "wait_time[s]", "build_time[s]", "count", "passing_count"]
     tabulate_data = []
 
     for pipeline_name, pipeline_time in pipelines_times.items():
         pipeline_wait_time = convert_ms_to_s(pipeline_time.wait_time)
         pipeline_build_time = convert_ms_to_s(pipeline_time.build_time)
+        pipeline_count = pipeline_time.count
+        pipeline_passing_count = pipeline_time.passing_count
 
-        if pipeline_wait_time or pipeline_build_time:
-            tabulate_data.append([pipeline_name, pipeline_wait_time, pipeline_build_time])
+        if pipeline_count:
+            tabulate_data.append(
+                [pipeline_name, pipeline_wait_time, pipeline_build_time, pipeline_count, pipeline_passing_count]
+            )
 
             total_wait_time += pipeline_wait_time
             total_build_time += pipeline_build_time
 
-    tabulate_data.append(["total", total_wait_time, total_build_time])
+    tabulate_data.append(["total", total_wait_time, total_build_time, "-", "-"])
 
     print(tabulate(tabulate_data, headers=headers))
 
@@ -239,7 +253,6 @@ def main():
     times_per_pipeline, run_time = calculate_times_per_pipeline(gocd_server_url, pipelines_instances)
 
     print_pipelines_times(times_per_pipeline)
-    print()
     print_run_time(run_time)
 
 

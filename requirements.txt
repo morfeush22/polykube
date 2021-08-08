@@ -1,7 +1,12 @@
+certifi==2021.5.30
+charset-normalizer==2.0.4
 decorator==4.4.2
+idna==3.2
 networkx==2.5.1
 pydot==1.4.2
 pygraphviz==1.7
 pyparsing==2.4.7
 PyYAML==5.4.1
+requests==2.26.0
 tabulate==0.8.9
+urllib3==1.26.6
