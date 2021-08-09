@@ -9,6 +9,9 @@ GOCD_POSTGRESQL_PASSWORD := postgres
 NUM_GOCD_CLIENTS_COMMON      ?= 3
 NUM_GOCD_CLIENTS_E2E_CLUSTER ?= 1
 
+uname     := $(shell uname -s)
+is_darwin := $(filter Darwin,$(uname))
+
 pause_all_pipelines: REGEXP_FILTER ?= .*
 pause_all_pipelines:
 	./pause-all-pipelines.sh http://$(GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT) $(REGEXP_FILTER)
@@ -42,7 +45,7 @@ run_gocd_clients_common:
 			--tty \
 			--privileged \
 			--name $(GOCD_CLIENT_NAME)-common-$${i} \
-			--group-add "$$(getent group docker | cut -d: -f3)" \
+            $(if $(is_darwin),,--group-add "$$(getent group docker | cut -d: -f3)") \
 			--volume /var/run/docker.sock:/var/run/docker.sock \
 			--env GO_SERVER_URL="http://$(RUN_GOCD_CLIENTS_COMMON_GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)/go" \
 			--env AGENT_AUTO_REGISTER_KEY="$(AGENT_AUTO_REGISTER_KEY)" \
@@ -78,7 +81,7 @@ run_gocd_clients_e2e_cluster:
 			--privileged \
 			--network=host \
 			--name $(GOCD_CLIENT_NAME)-e2e-cluster-$${i} \
-			--group-add "$$(getent group docker | cut -d: -f3)" \
+            $(if $(is_darwin),,--group-add "$$(getent group docker | cut -d: -f3)") \
 			--volume /var/run/docker.sock:/var/run/docker.sock \
 			--volume /etc/localtime:/etc/localtime \
 			--env GO_SERVER_URL="http://$(RUN_GOCD_CLIENTS_E2E_CLUSTER_GOCD_SERVER_LISTEN_HOST):$(GOCD_SERVER_LISTEN_PORT)/go" \
