@@ -5,10 +5,10 @@ Repeat each monorepo run 1 time.
 Test 1-n worker nodes + 1 E2E test worker node.
 
 1. Start server infrastructure (make start_server_infra)
-1. Pause/unpause desired pipelines (monorepo/polyrepo)
+1. Pause/unpause desired pipelines (monorepo/polyrepo) (make pause_all_pipelines)
 1. Prune docker (docker image prune --all, docker volume prune, docker network prune)
 1. Stop GoCD clients (make delete_gocd_clients)
-1. Start GoCD clients (make run_gocd_clients) (check number of workers)
+1. Start GoCD clients (make run_gocd_clients/make run_gocd_clients_common) (check number of workers)
 1. Save current timestamp (timestamp=`date +%s%3N`)
 1. Checkout desired commit in Kubernetes repository
 1. Refresh repositories/revert/empty commit
