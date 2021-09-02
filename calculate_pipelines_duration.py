@@ -209,6 +209,8 @@ def convert_ms_to_s(ms):
 def print_pipelines_times(pipelines_times):
     total_wait_time = 0
     total_build_time = 0
+    total_count = 0
+    total_passing_count = 0
 
     headers = ["pipeline_name", "wait_time[s]", "build_time[s]", "count", "passing_count"]
     tabulate_data = []
@@ -226,8 +228,10 @@ def print_pipelines_times(pipelines_times):
 
             total_wait_time += pipeline_wait_time
             total_build_time += pipeline_build_time
+            total_count += pipeline_count
+            total_passing_count += pipeline_passing_count
 
-    tabulate_data.append(["total", total_wait_time, total_build_time, "-", "-"])
+    tabulate_data.append(["total", total_wait_time, total_build_time, total_count, total_passing_count])
 
     print(tabulate(tabulate_data, headers=headers))
 
