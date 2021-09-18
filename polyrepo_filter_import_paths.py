@@ -23,9 +23,12 @@ def infer_type_and_subdir(import_path):
     apis_import_path = f"{kubernetes_repo_import_path}/pkg"
     plugins_import_path = f"{kubernetes_repo_import_path}/plugin/pkg"
     staging_import_path = "k8s.io"
+    # apiextensions-apiserver is binary but in staging
     kubernetes_apiextensions_apiserver_import_path = f"{staging_import_path}/apiextensions-apiserver"
+    # apiextensions-apiserver has it's own integration tests
     kubernetes_apiextensions_apiserver_test_integration_import_path = \
         f"{kubernetes_apiextensions_apiserver_import_path}/test/integration"
+    # kube-aggregator is binary but in staging
     kubernetes_kube_aggregator_import_path = f"{staging_import_path}/kube-aggregator"
 
     if import_path.startswith(binary_components_import_path):
@@ -49,7 +52,7 @@ def infer_type_and_subdir(import_path):
     else:
         logging.warning(f"do not know the type of {import_path}")
 
-    return ""
+    return None, ""
 
 
 def verify_dir_exists(pac_dir):

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# not used currently
+
 set -o errexit
 set -o nounset
 set -o pipefail

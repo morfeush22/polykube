@@ -8,8 +8,9 @@ LOG_LEVEL_WARN
 
 infer_import_path() {
   local component_relative_path="$1"
+  local component_absolute_path="$2"
 
-  local -n inferred_import_path="$2"
+  local -n inferred_import_path="$3"
 
   pushd "${component_absolute_path}" || return
 
@@ -44,7 +45,7 @@ main() {
 
   local import_path
 
-  infer_import_path "${component_relative_path}" import_path
+  infer_import_path "${component_relative_path}" "${component_absolute_path}" import_path
 
   cat "${deps_file_path}" |
     cut -f 1 -d ' ' |

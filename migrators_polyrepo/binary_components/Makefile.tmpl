@@ -19,6 +19,7 @@ build:
 	go clean -cache
 	go clean -testcache
 
+	# must be built through script, if not e2e fails
 	hack/make-rules/build.sh {{ $target }}
 
 	cp ./_output/bin/{{ $bin }} .

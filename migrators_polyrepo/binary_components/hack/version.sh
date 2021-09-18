@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# in some binaries, version is checked in tests
+
 # shellcheck disable=SC1090
 source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/../../../commons.sh
 source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/../../../b-log.sh

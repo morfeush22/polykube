@@ -15,7 +15,8 @@ logging.basicConfig(level=LOGLEVEL)
 
 
 # these cycles are present in graph, but they are harmless
-# during traversal, we still want to visit them
+# during traversal, we still want to visit them, cause they will be on the same 'stage'
+# this is not used - serves as documentation
 def known_harmless_cycles():
     return [
         ('k8s.io/kubernetes/pkg/api', 'k8s.io/kubernetes/pkg/apis'),
