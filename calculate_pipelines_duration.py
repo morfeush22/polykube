@@ -237,7 +237,7 @@ def print_pipelines_times(pipelines_times):
 
 
 def print_run_time(run_time):
-    print(f"time from start to end: {run_time}s")
+    print(f"time from start to end: {run_time}ms")
 
 
 def now_ms():
