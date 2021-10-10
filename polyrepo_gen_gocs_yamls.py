@@ -8,7 +8,8 @@ import yaml
 import polyrepo_filter_import_paths as fip
 from polyrepo_gocd_pipeline_templates import generate_binary_component_yaml_file, generate_integration_test_yaml_file, \
     generate_api_yaml_file, generate_plugin_yaml_file, generate_staging_yaml_file, polyrepo_e2e_cluster_pipeline_name, \
-    polyrepo_e2e_cmd_pipeline_name, generate_e2e_test_cluster_yaml_file, generate_e2e_test_cmd_yaml_file, artifacts_dir_name
+    polyrepo_e2e_cmd_pipeline_name, generate_e2e_test_cluster_yaml_file, generate_e2e_test_cmd_yaml_file, \
+    artifacts_dir_name
 
 LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
 logging.basicConfig(level=LOGLEVEL)
@@ -249,18 +250,18 @@ def generate_gocd_yaml_files(filtered_aggr_adj_file_merged_path, node_type_to_re
         else:
             logging.warning(f"unrecognized node: {node}")
 
-    triggering_integration_tests_nodes = integration_tests_nodes
-    untriggering_nodes = binary_component_nodes + apis_nodes + plugins_nodes + stating_nodes
+    untriggering_integration_tests_nodes = integration_tests_nodes
+    triggering_nodes = binary_component_nodes + apis_nodes + plugins_nodes + stating_nodes
 
-    for node in triggering_integration_tests_nodes:
-        node_triggers = x.neighbors(target_deps_graph, node)
+    for node in untriggering_integration_tests_nodes:
+        node_triggers = [n for n in x.neighbors(target_deps_graph, node) if n in triggering_nodes]
         node_type, node_subdir = fip.infer_type_and_subdir(node)
         node_git_server_repo_path = generate_repo_path(git_server_repos_prefix, node_type_to_relative_dir[node_type],
                                                        node_subdir)
 
         generate_gocd_yaml_file(node, node_triggers, node_type, node_git_server_repo_path, gocd_yamls_dest_root_dir)
 
-    for node in untriggering_nodes:
+    for node in triggering_nodes:
         node_type, node_subdir = fip.infer_type_and_subdir(node)
         node_git_server_repo_path = generate_repo_path(git_server_repos_prefix, node_type_to_relative_dir[node_type],
                                                        node_subdir)
