@@ -142,9 +142,16 @@ def get_pipelines_instances_scheduled_between_dates(gocd_dashboard, scheduled_af
         pipeline_history_url = pipeline["_links"]["self"]["href"]
         pipeline_history = get_gocd_pipeline_history(pipeline_history_url)
 
-        for pipeline_instance in pipeline_history["pipelines"]:
-            if scheduled_after_date < pipeline_instance["scheduled_date"] < scheduled_before_date:
-                pipeline_instances_scheduled_after_date[pipeline_instance["name"]].append(pipeline_instance)
+        while True:
+            for pipeline_instance in pipeline_history["pipelines"]:
+                if scheduled_after_date < pipeline_instance["scheduled_date"] < scheduled_before_date:
+                    pipeline_instances_scheduled_after_date[pipeline_instance["name"]].append(pipeline_instance)
+
+            if "_links" not in pipeline_history or "next" not in pipeline_history["_links"]:
+                break
+
+            pipeline_history_next_url = pipeline_history["_links"]["next"]["href"]
+            pipeline_history = get_gocd_pipeline_history(pipeline_history_next_url)
 
     return pipeline_instances_scheduled_after_date
 
