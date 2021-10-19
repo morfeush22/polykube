@@ -1,3 +1,4 @@
+import json
 import logging
 import math
 import os
@@ -180,7 +181,11 @@ def calculate_times_per_pipeline(gocd_server_url, pipelines_instances):
                     stage["counter"]
                 )
 
-                detailed_stage_instance = get_gocd_stage_instance(stage_instance_url)
+                try:
+                    detailed_stage_instance = get_gocd_stage_instance(stage_instance_url)
+                except json.decoder.JSONDecodeError:
+                    logging.warning(f"corrupted json at {stage_instance_url}, skipping")
+                    continue
 
                 stage_wait_time, stage_build_time, start_time, end_time = extract_stage_times(detailed_stage_instance)
 
