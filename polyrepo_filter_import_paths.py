@@ -112,7 +112,7 @@ def verify_import_paths(aggr_adj_file_merged_handle, type_to_root_dir):
         dst_type, dst_subdir = infer_type_and_subdir(dst_import_path)
 
         if not_important_package(dst_import_path):
-            logging.info(f"skipping package with dest {dst_import_path}")
+            logging.info(f"skipping {src_import_path} package with dest {dst_import_path}")
             continue
 
         verify_dir_exists(f"{type_to_root_dir[src_type]}/{src_subdir}")
