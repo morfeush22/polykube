@@ -106,10 +106,6 @@ pipelines:
         branch: master
         git: http://{{ getenv "GIT_SERVER_LISTEN_HOST" }}:{{ getenv "GIT_SERVER_LISTEN_PORT" }}/monorepo/kubernetes.git
         shallow_clone: false
-      monorepo_pipeline_common:
-        ignore_for_scheduling: false
-        pipeline: monorepo_pipeline_common
-        stage: e2e_cmd
     stages:
       - e2e_cluster:
           approval:
