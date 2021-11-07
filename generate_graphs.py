@@ -19,7 +19,7 @@ def generate_graph_metadata(x, poly_s, mono_s):
     monorepo_metadata = {
         "data": [x, mono_s],
         "style": {
-            "linestyle": "dashdot",
+            "linestyle": "dashed",
             "marker": "s",
             "fillstyle": "none",
             "color": "green",
@@ -44,6 +44,8 @@ def generate_graph(polyrepo_metadata, monorepo_metadata, title, x_axis_label, y_
     x = polyrepo_metadata["data"][0]
     y = polyrepo_metadata["data"][1]
 
+    y_poly = y
+
     polyrepo_style = polyrepo_metadata["style"]
     polyrepo_label = polyrepo_metadata["label"]
 
@@ -52,27 +54,20 @@ def generate_graph(polyrepo_metadata, monorepo_metadata, title, x_axis_label, y_
     lns1 = ax1.plot(x, y, **polyrepo_style, label=polyrepo_label)
 
     ax1.grid(linestyle='dashed')
-    ax1.margins(0.125, 0.2)
 
     plt.setp(ax1.get_xticklabels(), rotation=0, horizontalalignment="right")
 
-    ax2 = ax1.twinx()
-
-    monorepo_color = monorepo_metadata["style"]["color"]
-
-    ax2.set_title(title, pad=20)
-    ax2.set_ylabel(f"{y_axis_label}", color=monorepo_color)
-    ax2.tick_params(axis='y', labelcolor=monorepo_color)
-    ax2.ticklabel_format(style='plain')
-
     y = monorepo_metadata["data"][1]
+
+    y_mono = y
 
     monorepo_style = monorepo_metadata["style"]
     monorepo_label = monorepo_metadata["label"]
 
-    lns2 = ax2.plot(x, y, **monorepo_style, label=monorepo_label)
+    lns2 = ax1.plot(x, y, **monorepo_style, label=monorepo_label)
 
-    ax2.margins(0.125, 0.2)
+    y_max = max(*y_poly, *y_mono)
+    ax1.set_ylim([0, y_max * 1.2])
 
     lns = lns1 + lns2
     labs = [l.get_label() for l in lns]
@@ -112,9 +107,9 @@ def generate_graphs():
         build_poly_s = [result["times"][1] for result in test_result["results"]][:n]
         total_poly_s = [result["times"][2] // 1000 for result in test_result["results"]][:n]  # total in ms
 
-        wait_mono_s = [test_result["results"][n]["times"][0] for i in range(1, n + 1)]
-        build_mono_s = [test_result["results"][n]["times"][1] for i in range(1, n + 1)]
-        total_mono_s = [test_result["results"][n]["times"][2] // 1000 for i in range(1, n + 1)]  # total in ms
+        wait_mono_s = [result["times"][0] for result in test_result["results"]][n:]
+        build_mono_s = [result["times"][1] for result in test_result["results"]][n:]
+        total_mono_s = [result["times"][2] // 1000 for result in test_result["results"]][n:]  # total in ms
 
         x_axis_label = "Liczba węzłów roboczych common [jednostki]"
         y_axis_label = "Czas [s]"
@@ -176,6 +171,26 @@ test_results = [
                 "common_count": 1,
                 "e2e_cluster_count": 1,
             },
+            {
+                "times": [103, 15893, 9954015],
+                "common_count": 2,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [94, 16148, 9917431],
+                "common_count": 3,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [100, 16140, 10012517],
+                "common_count": 4,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [100, 15897, 10020967],
+                "common_count": 5,
+                "e2e_cluster_count": 1,
+            },
         ],
     },
     {
@@ -209,6 +224,26 @@ test_results = [
             {
                 "times": [95, 16551, 10386992],
                 "common_count": 1,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [99, 16136, 9917896],
+                "common_count": 2,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [104, 16414, 10245467],
+                "common_count": 3,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [98, 16873, 10523948],
+                "common_count": 4,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [105, 16328, 10428118],
+                "common_count": 5,
                 "e2e_cluster_count": 1,
             },
         ],
@@ -246,6 +281,26 @@ test_results = [
                 "common_count": 1,
                 "e2e_cluster_count": 1,
             },
+            {
+                "times": [98, 16270, 10083809],
+                "common_count": 2,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [98, 16260, 10069216],
+                "common_count": 3,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [103, 16079, 9956806],
+                "common_count": 4,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [97, 16180, 9985754],
+                "common_count": 5,
+                "e2e_cluster_count": 1,
+            },
         ],
     },
     {
@@ -279,6 +334,26 @@ test_results = [
             {
                 "times": [98, 16430, 10392029],
                 "common_count": 1,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [96, 16172, 9953741],
+                "common_count": 2,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [95, 16161, 10211810],
+                "common_count": 3,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [108, 16622, 10581114],
+                "common_count": 4,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [102, 16788, 10784645],
+                "common_count": 5,
                 "e2e_cluster_count": 1,
             },
         ],
@@ -316,6 +391,26 @@ test_results = [
                 "common_count": 1,
                 "e2e_cluster_count": 1,
             },
+            {
+                "times": [99, 16584, 10003413],
+                "common_count": 2,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [94, 16040, 10037346],
+                "common_count": 3,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [102, 15981, 10011315],
+                "common_count": 4,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [93, 15890, 10024516],
+                "common_count": 5,
+                "e2e_cluster_count": 1,
+            },
         ],
     },
     {
@@ -349,6 +444,26 @@ test_results = [
             {
                 "times": [105, 16142, 9550154],
                 "common_count": 1,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [96, 16436, 10398426],
+                "common_count": 2,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [93, 16399, 10121057],
+                "common_count": 3,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [98, 16904, 10007003],
+                "common_count": 4,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [100, 16072, 9994140],
+                "common_count": 5,
                 "e2e_cluster_count": 1,
             },
         ],
@@ -386,6 +501,26 @@ test_results = [
                 "common_count": 1,
                 "e2e_cluster_count": 1,
             },
+            {
+                "times": [92, 16042, 9986117],
+                "common_count": 2,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [100, 16502, 10050336],
+                "common_count": 3,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [104, 16482, 10598562],
+                "common_count": 4,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [101, 16766, 10375156],
+                "common_count": 5,
+                "e2e_cluster_count": 1,
+            },
         ],
     },
     {
@@ -419,6 +554,26 @@ test_results = [
             {
                 "times": [95, 15976, 9592182],
                 "common_count": 1,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [93, 16486, 9937102],
+                "common_count": 2,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [101, 16319, 10001888],
+                "common_count": 3,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [96, 16216, 9932196],
+                "common_count": 4,
+                "e2e_cluster_count": 1,
+            },
+            {
+                "times": [97, 16227, 10006991],
+                "common_count": 5,
                 "e2e_cluster_count": 1,
             },
         ],
