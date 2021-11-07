@@ -33,12 +33,10 @@ def generate_graph_metadata(x, poly_s, mono_s):
 def generate_graph(polyrepo_metadata, monorepo_metadata, title, x_axis_label, y_axis_label):
     fig, ax1 = plt.subplots()
 
-    polyrepo_color = polyrepo_metadata["style"]["color"]
-
     ax1.set_title(title, pad=20)
     ax1.set_xlabel(f"{x_axis_label}")
-    ax1.set_ylabel(f"{y_axis_label}", color=polyrepo_color)
-    ax1.tick_params(axis='y', labelcolor=polyrepo_color)
+    ax1.set_ylabel(f"{y_axis_label}")
+    ax1.tick_params(axis='y')
     ax1.ticklabel_format(style='plain')
 
     x = polyrepo_metadata["data"][0]
