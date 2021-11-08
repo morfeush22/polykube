@@ -15,22 +15,36 @@ logging.basicConfig(level=LOGLEVEL)
 
 class PipelineTimes:
 
-    def __init__(self, wait_time=0, build_time=0, count=0, passing_count=0):
+    def __init__(self, wait_time=0, build_time=0, count=0, passing_wait_time=0, passing_build_time=0, passing_count=0):
         self.wait_time = wait_time
         self.build_time = build_time
         self.count = count
+
+        self.passing_wait_time = passing_wait_time
+        self.passing_build_time = passing_build_time
         self.passing_count = passing_count
+
+        self.main = True
 
         super().__init__()
 
-    def add_times(self, wait_time, build_time):
+    def add_times(self, wait_time, build_time, passing):
         self.wait_time += wait_time
         self.build_time += build_time
         self.count += 1
 
-    def add_status(self, passing):
         if passing:
+            self.passing_wait_time += wait_time
+            self.passing_build_time += build_time
             self.passing_count += 1
+
+
+class PipelineStageTimes(PipelineTimes):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.main = False
 
 
 def get_job_state_transition_time(job_state_transitions, n):
@@ -159,7 +173,7 @@ def get_pipelines_instances_scheduled_between_dates(gocd_dashboard, scheduled_af
 def calculate_times_per_pipeline(gocd_server_url, pipelines_instances):
     passed_status = "Passed"
 
-    pipelines_times = defaultdict(PipelineTimes)
+    pipelines_times = {}
 
     run_start_time = math.inf
     run_end_time = 0
@@ -196,14 +210,24 @@ def calculate_times_per_pipeline(gocd_server_url, pipelines_instances):
 
                 stage_wait_time, stage_build_time, start_time, end_time = extract_stage_times(detailed_stage_instance)
 
+                stage_name = stage["name"]
+                pipeline_stage_name = f"{pipeline_name}/{stage_name}"
+
+                if pipeline_stage_name not in pipelines_times:
+                    pipelines_times[pipeline_stage_name] = PipelineStageTimes()
+
+                pipelines_times[pipeline_stage_name].add_times(stage_wait_time, stage_build_time, passing)
+
                 run_start_time = min(run_start_time, start_time)
                 run_end_time = max(run_end_time, end_time)
 
                 pipeline_instance_wait_time += stage_wait_time
                 pipeline_instance_build_time += stage_build_time
 
-            pipelines_times[pipeline_name].add_times(pipeline_instance_wait_time, pipeline_instance_build_time)
-            pipelines_times[pipeline_name].add_status(passing)
+            if pipeline_name not in pipelines_times:
+                pipelines_times[pipeline_name] = PipelineTimes()
+
+            pipelines_times[pipeline_name].add_times(pipeline_instance_wait_time, pipeline_instance_build_time, passing)
 
     return pipelines_times, run_end_time - run_start_time
 
@@ -224,26 +248,48 @@ def print_pipelines_times(pipelines_times):
     total_count = 0
     total_passing_count = 0
 
-    headers = ["pipeline_name", "wait_time[s]", "build_time[s]", "count", "passing_count"]
+    headers = [
+        "pipeline_name",
+        "wait_time[s]",
+        "build_time[s]",
+        "count",
+        "passing_wait_time[s]",
+        "passing_build_time[s]",
+        "passing_count",
+        "passing_build_time_avg[s]"
+    ]
+
     tabulate_data = []
 
     for pipeline_name, pipeline_time in pipelines_times.items():
         pipeline_wait_time = convert_ms_to_s(pipeline_time.wait_time)
         pipeline_build_time = convert_ms_to_s(pipeline_time.build_time)
         pipeline_count = pipeline_time.count
+        pipeline_passing_wait_time = convert_ms_to_s(pipeline_time.passing_wait_time)
+        pipeline_passing_build_time = convert_ms_to_s(pipeline_time.passing_build_time)
         pipeline_passing_count = pipeline_time.passing_count
 
         if pipeline_count:
             tabulate_data.append(
-                [pipeline_name, pipeline_wait_time, pipeline_build_time, pipeline_count, pipeline_passing_count]
+                [
+                    pipeline_name,
+                    pipeline_wait_time,
+                    pipeline_build_time,
+                    pipeline_count,
+                    pipeline_passing_wait_time,
+                    pipeline_passing_build_time,
+                    pipeline_passing_count,
+                    pipeline_passing_build_time / pipeline_passing_count
+                ]
             )
 
-            total_wait_time += pipeline_wait_time
-            total_build_time += pipeline_build_time
-            total_count += pipeline_count
-            total_passing_count += pipeline_passing_count
+            if pipeline_time.main:
+                total_wait_time += pipeline_wait_time
+                total_build_time += pipeline_build_time
+                total_count += pipeline_count
+                total_passing_count += pipeline_passing_count
 
-    tabulate_data.append(["total", total_wait_time, total_build_time, total_count, total_passing_count])
+    tabulate_data.append(["total", total_wait_time, total_build_time, total_count, total_passing_count, "-", "-", "-"])
 
     print(tabulate(tabulate_data, headers=headers))
 
