@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from matplotlib import pyplot as plt
+from matplotlib.ticker import MultipleLocator
 
 
 def generate_graph_metadata(x, poly_s, mono_s):
@@ -30,7 +31,7 @@ def generate_graph_metadata(x, poly_s, mono_s):
     return polyrepo_metadata, monorepo_metadata
 
 
-def generate_graph(polyrepo_metadata, monorepo_metadata, title, x_axis_label, y_axis_label):
+def generate_graph_general(polyrepo_metadata, monorepo_metadata, title, x_axis_label, y_axis_label):
     fig, ax1 = plt.subplots()
 
     ax1.set_title(title, pad=20)
@@ -74,6 +75,31 @@ def generate_graph(polyrepo_metadata, monorepo_metadata, title, x_axis_label, y_
     return fig, lgd
 
 
+def generate_graph_detailed(data, title, y_axis_label):
+    fig, ax1 = plt.subplots()
+
+    ax1.set_title(title, pad=20)
+    ax1.set_ylabel(f"{y_axis_label}")
+    ax1.tick_params(axis='y')
+    ax1.ticklabel_format(style='plain')
+
+    x = [d["name"] for d in data]
+    y = [d["build_time_avg_s"] for d in data]
+
+    ax1.yaxis.set_major_locator(MultipleLocator(1000))
+
+    ax1.bar(x, y)
+
+    ax1.grid(linestyle='dashed', axis='y')
+
+    plt.setp(ax1.get_xticklabels(), rotation=90, horizontalalignment="right")
+
+    y_max = max(*y)
+    ax1.set_ylim([0, y_max * 1.2])
+
+    return fig, None
+
+
 def create_destination_path(basedir, path):
     final_path = os.path.join(basedir, path)
     Path(os.path.dirname(final_path)).mkdir(parents=True, exist_ok=True)
@@ -87,13 +113,13 @@ def save_graph_to_file(fig, lgd, path, basedir="data"):
     if lgd is not None:
         fig.savefig(final_path, bbox_extra_artists=(lgd,), bbox_inches="tight")
     else:
-        fig.savefig(final_path)
+        fig.savefig(final_path, bbox_inches="tight")
 
     plt.close(fig)
 
 
 def generate_graphs():
-    for test_result in test_results:
+    for test_result in test_results_general:
         commit = test_result["commit"]
 
         # max number of common nodes = possible configurations
@@ -114,20 +140,25 @@ def generate_graphs():
 
         polyrepo_metadata, monorepo_metadata = generate_graph_metadata(x, wait_poly_s, wait_mono_s)
         title = f"Scenariusz {commit}, czas oczekiwania"
-        fig, lgd = generate_graph(polyrepo_metadata, monorepo_metadata, title, x_axis_label, y_axis_label)
+        fig, lgd = generate_graph_general(polyrepo_metadata, monorepo_metadata, title, x_axis_label, y_axis_label)
         wait_graph_path = f"{commit}/wait.png"
         save_graph_to_file(fig, lgd, wait_graph_path)
 
         polyrepo_metadata, monorepo_metadata = generate_graph_metadata(x, build_poly_s, build_mono_s)
         title = f"Scenariusz {commit}, czas budowania"
-        fig, lgd = generate_graph(polyrepo_metadata, monorepo_metadata, title, x_axis_label, y_axis_label)
+        fig, lgd = generate_graph_general(polyrepo_metadata, monorepo_metadata, title, x_axis_label, y_axis_label)
         build_graph_path = f"{commit}/build.png"
         save_graph_to_file(fig, lgd, build_graph_path)
 
         polyrepo_metadata, monorepo_metadata = generate_graph_metadata(x, total_poly_s, total_mono_s)
         title = f"Scenariusz {commit}, czas pełnej pętli zwrotnej"
-        fig, lgd = generate_graph(polyrepo_metadata, monorepo_metadata, title, x_axis_label, y_axis_label)
+        fig, lgd = generate_graph_general(polyrepo_metadata, monorepo_metadata, title, x_axis_label, y_axis_label)
         total_graph_path = f"{commit}/total.png"
+        save_graph_to_file(fig, lgd, total_graph_path)
+
+        title = f"Średni czas budowania projektu pipeline"
+        fig, lgd = generate_graph_detailed(test_results_detailed, title, y_axis_label)
+        total_graph_path = f"pipelines.png"
         save_graph_to_file(fig, lgd, total_graph_path)
 
 
@@ -135,7 +166,7 @@ def main():
     generate_graphs()
 
 
-test_results = [
+test_results_general = [
     {
         "commit": "a1892cea1a7120952d978509f4cb616bbd3837cd",
         "results": [
@@ -575,6 +606,119 @@ test_results = [
                 "e2e_cluster_count": 1,
             },
         ],
+    },
+]
+
+test_results_detailed = [
+    {
+        "name": "polyrepo_k8s_io_kubernetes_pkg_cloudprovider_pipeline",
+        "count": 28,
+        "build_time_avg_s": 416.2142857142857,
+    },
+    {
+        "name": "polyrepo_k8s_io_kubernetes_pkg_controller_pipeline",
+        "count": 25,
+        "build_time_avg_s": 1198.76,
+    },
+    {
+        "name": "polyrepo_k8s_io_kubernetes_pkg_kubelet_pipeline",
+        "count": 49,
+        "build_time_avg_s": 1158.0,
+    },
+    {
+        "name": "polyrepo_k8s_io_kubernetes_pkg_proxy_pipeline",
+        "count": 25,
+        "build_time_avg_s": 243.2,
+    },
+    {
+        "name": "polyrepo_k8s_io_kubernetes_pkg_scheduler_pipeline",
+        "count": 37,
+        "build_time_avg_s": 374.13513513513516,
+    },
+    {
+        "name": "polyrepo_k8s_io_kubernetes_pkg_volume_pipeline",
+        "count": 49,
+        "build_time_avg_s": 861.7142857142857,
+    },
+    {
+        "name": "polyrepo_k8s_io_kubernetes_cmd_kube_apiserver_pipeline",
+        "count": 41,
+        "build_time_avg_s": 1187.6341463414635,
+    },
+    {
+        "name": "polyrepo_k8s_io_kubernetes_cmd_kube_controller_manager_pipeline",
+        "count": 46,
+        "build_time_avg_s": 1331.2391304347825,
+    },
+    {
+        "name": "polyrepo_k8s_io_kubernetes_cmd_kubelet_pipeline",
+        "count": 68,
+        "build_time_avg_s": 1290.4411764705883,
+    },
+    {
+        "name": "polyrepo_k8s_io_kubernetes_cmd_kube_scheduler_pipeline",
+        "count": 47,
+        "build_time_avg_s": 577.6595744680851,
+    },
+    {
+        "name": "polyrepo_e2e_cluster_pipeline",
+        "count": 128,
+        "build_time_avg_s": 8732.2109375,
+    },
+    {
+        "name": "polyrepo_k8s_io_kubernetes_test_integration_auth_pipeline",
+        "count": 128,
+        "build_time_avg_s": 879.1328125,
+    },
+    {
+        "name": "polyrepo_k8s_io_kubernetes_test_integration_client_pipeline",
+        "count": 145,
+        "build_time_avg_s": 852.2758620689655,
+    },
+    {
+        "name": "polyrepo_k8s_io_kubernetes_test_integration_node_pipeline",
+        "count": 143,
+        "build_time_avg_s": 764.8041958041958,
+    },
+    {
+        "name": "polyrepo_k8s_io_kubernetes_test_integration_scheduler_pipeline",
+        "count": 131,
+        "build_time_avg_s": 1180.2137404580153,
+    },
+    {
+        "name": "polyrepo_k8s_io_kubernetes_test_integration_volumescheduling_pipeline",
+        "count": 139,
+        "build_time_avg_s": 1037.1223021582734,
+    },
+    {
+        "name": "polyrepo_k8s_io_legacy_cloud_providers_pipeline",
+        "count": 27,
+        "build_time_avg_s": 495.962962962963,
+    },
+    {
+        "name": "monorepo_pipeline_common/build",
+        "count": 77,
+        "build_time_avg_s": 956.1688311688312,
+    },
+    {
+        "name": "monorepo_pipeline_common/test",
+        "count": 63,
+        "build_time_avg_s": 3639.714285714286,
+    },
+    {
+        "name": "monorepo_pipeline_common/integration",
+        "count": 52,
+        "build_time_avg_s": 5043.25,
+    },
+    {
+        "name": "monorepo_pipeline_common",
+        "count": 51,
+        "build_time_avg_s": 9716.921568627451,
+    },
+    {
+        "name": "monorepo_pipeline_e2e",
+        "count": 70,
+        "build_time_avg_s": 6403.342857142857,
     },
 ]
 
