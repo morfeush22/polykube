@@ -156,7 +156,7 @@ def generate_graphs():
         total_graph_path = f"{commit}/total.png"
         save_graph_to_file(fig, lgd, total_graph_path)
 
-        title = f"Średni czas budowania projektu pipeline"
+        title = f"Średni czas budowania projektu"
         fig, lgd = generate_graph_detailed(test_results_detailed, title, y_axis_label)
         total_graph_path = f"pipelines.png"
         save_graph_to_file(fig, lgd, total_graph_path)
