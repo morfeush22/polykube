@@ -289,7 +289,7 @@ def print_pipelines_times(pipelines_times):
                 total_count += pipeline_count
                 total_passing_count += pipeline_passing_count
 
-    tabulate_data.append(["total", total_wait_time, total_build_time, total_count, total_passing_count, "-", "-", "-"])
+    tabulate_data.append(["total", total_wait_time, total_build_time, total_count, "-", "-", total_passing_count, "-"])
 
     print(tabulate(tabulate_data, headers=headers))
 
